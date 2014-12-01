@@ -24,7 +24,7 @@ Installation
 Require [`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle) using composer
 
 ```sh
-$ php composer.phar require gordalina/GordalinaMixpanelBundle:~2.6
+$ php composer.phar require gordalina/mixpanel-bundle:~2.6
 ```
 
 Or require
