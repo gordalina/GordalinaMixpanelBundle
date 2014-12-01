@@ -21,7 +21,13 @@ repository](https://github.com/mixpanel/mixpanel-php). If you are using Mixpanel
 Installation
 ------------
 
-Require
+Require [`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle) using composer
+
+```sh
+$ php composer.phar require gordalina/GordalinaMixpanelBundle:~2.6
+```
+
+Or require
 [`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle)
 to your `composer.json` file:
 
