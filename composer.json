@@ -1,0 +1,27 @@
+{
+    "name": "gordalina/mixpanel-bundle",
+    "description": "Integration of Mixpanel into Symfony2",
+    "keywords": ["mixpanel", "bundle"],
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Samuel Gordalina",
+            "email": "samuel.gordalina@gmail.com"
+        }
+    ],
+    "require": {
+        "symfony/framework-bundle": "~2.4",
+        "mixpanel/mixpanel-php": "~2.6"
+    },
+    "require-dev": {},
+    "autoload": {
+      "psr-0": { "Gordalina\\MixpanelBundle": "" }
+    },
+    "target-dir": "Gordalina/MixpanelBundle",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.7-dev"
+        }
+    }
+}

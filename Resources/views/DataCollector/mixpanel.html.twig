@@ -1,0 +1,82 @@
+{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <img width="22" height="19" alt="Mixpanel" style="margin:5px 0 3px 0" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAmBAMAAABNMWRUAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAwUExURQAAAD8/Pz4+Pj8/Pz4+Pj4+Pjs7Oz4+Pj4+Pj8/Pz4+Pj4+Pj4+Pj4+Pj4+Pj8/P4rM7nQAAAAPdFJOUwARlkyGxAetJvY4detf2rpWZgcAAAF3SURBVCjPzZKxL0NRFMZPPanmteRFTBLRwWDSZ7DXJBFJlVgsfU0MpAahg0m7moRGYqtJsDDVYKi/QCsdjMU/0Gg0TXl8vvte08qrVeIM933nd8+599xznsi/Mb8l6+f8Bi4trkmR0TOFL3JreSxLqoYjQ3wlcwatXeJYPQPgIcHlWTSk+W2ZxLY9kcExlqbQJK41Kws4IUZc9BI+xR+BoalIX6JB3DJEigiLbMLU8MZz95GVWJPigEIGcK3hVZQo8EqKcTClD1ENT/T6MenFi/SCvfhOlJj14nd6QzC9+IstKLI4D8aqjOBDvHgF93lsiVS5JSHbKaCsIc4O1XlQqkCiz6sW31osUJ9LZ73Nd+uWP8G6qq0dsffSvfqmI1lozlVj0928IGdqG0oN5m2zg0PEiCp1BRw6f07FmRfNuT8GDtppt+nEtHEEqnVqlGWRDYXDyq3CGYIEti2VQjt1o9xtx3y1dq74H3d+vGy41DB/e3HS6GXfnWbOe+bMkrUAAAAASUVORK5CYII="/>
+        <span class="sf-toolbar-status">{{ collector.total }}</span>
+    {% endset %}
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Events</b>
+            <span>{{ collector.eventCount }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Engagements</b>
+            <span>{{ collector.engagementCount }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Query time</b>
+            <span>{{ '%0.2f'|format(collector.time) }} ms</span>
+        </div>
+    {% endset %}
+    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+{% endblock %}
+
+{% block menu %}
+<span class="label">
+    <span class="icon">
+        <img width="32" height="28" alt="Mixpanel" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAmBAMAAABNMWRUAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAwUExURQAAAD8/Pz4+Pj8/Pz4+Pj4+Pjs7Oz4+Pj4+Pj8/Pz4+Pj4+Pj4+Pj4+Pj4+Pj8/P4rM7nQAAAAPdFJOUwARlkyGxAetJvY4detf2rpWZgcAAAF3SURBVCjPzZKxL0NRFMZPPanmteRFTBLRwWDSZ7DXJBFJlVgsfU0MpAahg0m7moRGYqtJsDDVYKi/QCsdjMU/0Gg0TXl8vvte08qrVeIM933nd8+599xznsi/Mb8l6+f8Bi4trkmR0TOFL3JreSxLqoYjQ3wlcwatXeJYPQPgIcHlWTSk+W2ZxLY9kcExlqbQJK41Kws4IUZc9BI+xR+BoalIX6JB3DJEigiLbMLU8MZz95GVWJPigEIGcK3hVZQo8EqKcTClD1ENT/T6MenFi/SCvfhOlJj14nd6QzC9+IstKLI4D8aqjOBDvHgF93lsiVS5JSHbKaCsIc4O1XlQqkCiz6sW31osUJ9LZ73Nd+uWP8G6qq0dsffSvfqmI1lozlVj0928IGdqG0oN5m2zg0PEiCp1BRw6f07FmRfNuT8GDtppt+nEtHEEqnVqlGWRDYXDyq3CGYIEti2VQjt1o9xtx3y1dq74H3d+vGy41DB/e3HS6GXfnWbOe+bMkrUAAAAASUVORK5CYII=" />
+    </span>
+    <strong>Mixpanel</strong>
+    <span class="count">
+        <span>{{ collector.total }}</span>
+        <span>{{ '%0.0f'|format(collector.time) }} MS</span>
+    </span>
+</span>
+{% endblock %}
+
+{% block panel %}
+    {% for id in collector.config|keys %}
+        <h2><pre>{{ id }}</pre></h2>
+
+        <h3>Events</h3>
+
+        {% if collector.getEvents(id)|length > 0 %}
+            {% include 'WebProfilerBundle:Profiler:table.html.twig' with {data: collector.getEvents(id)} only %}
+        {% else %}
+            <p>
+                <em>No events.</em>
+            </p>
+        {% endif %}
+
+        <h3>Engagement</h3>
+
+        {% if collector.getEngagement(id)|length > 0 %}
+            {% include 'WebProfilerBundle:Profiler:table.html.twig' with {data: collector.getEngagement(id)} only %}
+        {% else %}
+            <p>
+                <em>No engagement.</em>
+            </p>
+        {% endif %}
+    {% endfor %}
+
+    <h2>Projects</h2>
+
+    {% if collector.projects|length > 0 %}
+        {% include 'WebProfilerBundle:Profiler:table.html.twig' with {data: collector.projects} only %}
+    {% else %}
+        <p>
+            <em>No projects.</em>
+        </p>
+    {% endif %}
+
+    <h2>Configuration</h2>
+    {% for id in collector.config|keys %}
+        <h3><pre>{{ id }}</pre></h3>
+
+        {% include 'WebProfilerBundle:Profiler:table.html.twig' with {data: collector.config[id]} only %}
+    {% endfor %}
+
+    <h3>Users</h3>
+    {% include 'WebProfilerBundle:Profiler:table.html.twig' with {data: collector.users} only %}
+{% endblock %}
