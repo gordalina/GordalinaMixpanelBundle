@@ -139,12 +139,6 @@ This bundle uses property access to get the values out of the user object, so
 event if you dont have a `first_name` property, but have a `getFirstName` method
 it will work.
 
-In the following example, we call UpdateUser, which sends all information registered
-in the configuration above, but we override the `id` property with an expression
-that evaluates the user id.
-
-The `@Expression` annotation uses [ExpressionLanguage](http://symfony.com/doc/current/components/expression_language/index.html) for evaluation.
-
 
 ```php
 <?php
@@ -155,7 +149,7 @@ use Gordalina\MixpanelBundle\Annotation as Mixpanel;
 class UserController
 {
     /**
-     * @Mixpanel\UpdateUser(id=@Mixpanel\Expression("user.getId()"))
+     * @Mixpanel\UpdateUser()
      */
     public function userUpdatedAction(User $user, Request $request)
     {
@@ -163,7 +157,11 @@ class UserController
     }
 ```
 
-Another example which tracks a transaction with the `@Expression` annotation
+In the following example, we call UpdateUser, which sends all information registered
+in the configuration above, but we override the `id` property with an expression
+that evaluates the user id.
+The `@Expression` annotation uses [ExpressionLanguage](http://symfony.com/doc/current/components/expression_language/index.html)
+for evaluation.
 
 ```php
 <?php
@@ -175,7 +173,7 @@ class OrderController
 {
     /**
      * @Mixpanel\Track("Order Completed")
-     * @Mixpanel\TrackCharge(amount=@Mixpanel\Expression("order.getAmount()"))
+     * @Mixpanel\TrackCharge(id=@Mixpanel\Expression("user.getId()"), amount=@Mixpanel\Expression("order.getAmount()"))
      */
     public function orderCompletedAction(Order $order, Request $request)
     {
