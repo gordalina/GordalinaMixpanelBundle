@@ -6,7 +6,7 @@ into Symfony2.
 
 **Important:** this bundle is developed in sync with [Mixpanel's
 repository](https://github.com/mixpanel/mixpanel-php). If you are using Mixpanel
-`2.x`, you need to use the `~2.0` releases of the bundle (or lower).
+`2.6`, you need to use the `~2.6` releases of the bundle (or higher if available).
 
 * [Installation](#installation)
 * [Usage](#usage)
