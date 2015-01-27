@@ -11,14 +11,19 @@
         }
     ],
     "require": {
-        "symfony/framework-bundle": "~2.4",
+        "symfony/framework-bundle": "2.6.*",
         "mixpanel/mixpanel-php": "~2.6"
     },
-    "require-dev": {},
+    "require-dev": {
+        "phpspec/phpspec": "~2.1"
+    },
     "autoload": {
       "psr-0": { "Gordalina\\MixpanelBundle": "" }
     },
     "target-dir": "Gordalina/MixpanelBundle",
+    "config": {
+        "bin-dir": "bin"
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "2.7-dev"
