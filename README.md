@@ -264,7 +264,13 @@ gordalina_mixpanel:
             phone: phone
 ```
 
+Spec
+----
 
+In order to run the specs install all components with composer and run:
+```
+./bin/phpspec run
+```
 
 License
 -------

@@ -43,7 +43,7 @@ class AuthenticationListener
      */
     public function onAuthenticationSuccess(AuthenticationEvent $e)
     {
-        $this->authentication->onAuthenticationSuccess($e->getToken());
+        $this->authentication->onAuthenticationSuccess($e->getAuthenticationToken());
     }
 
     /**
