@@ -88,6 +88,9 @@ class UserData
     public function getProperties($instance = null)
     {
         $instance = $this->getUser($instance);
+        if (empty($instance) || !is_object($instance)) {
+            return array();
+        }
         $className = get_class($instance);
 
         if (isset($this->properties[$className])) {
