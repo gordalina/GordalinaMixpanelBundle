@@ -43,10 +43,10 @@ class Flusher
 
     /**
      * @param ManagerRegistry $registry
-     * @param Stopwatch       $stopwatch
-     * @param boolean         $enableProfiler
+     * @param Stopwatch       $stopwatch      defaults to null
+     * @param boolean         $enableProfiler defaults to false
      */
-    public function __construct(ManagerRegistry $registry, Stopwatch $stopwatch, $enableProfiler)
+    public function __construct(ManagerRegistry $registry, Stopwatch $stopwatch = null, $enableProfiler = false)
     {
         $this->registry = $registry;
         $this->stopwatch = $stopwatch ?: new Stopwatch();
