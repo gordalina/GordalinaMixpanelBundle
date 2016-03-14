@@ -1,7 +1,7 @@
 {
     "name": "gordalina/mixpanel-bundle",
-    "description": "Integration of Mixpanel into Symfony2",
-    "keywords": ["mixpanel", "bundle"],
+    "description": "Symfony bundle for Mixpanel",
+    "keywords": ["mixpanel", "bundle", "symfony"],
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
