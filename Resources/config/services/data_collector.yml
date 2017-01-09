@@ -6,5 +6,4 @@ services:
             - "@gordalina_mixpanel.flusher"
         tags:
             - { name: data_collector, template: "GordalinaMixpanelBundle:DataCollector:mixpanel", id: "mixpanel" }
-        lazy: true
         public: false

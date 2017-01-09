@@ -79,8 +79,7 @@ class GordalinaMixpanelExtension extends Extension
             $container
                 ->register($id, 'Mixpanel')
                 ->addArgument($project['token'])
-                ->addArgument($project['options'])
-                ->setLazy(true);
+                ->addArgument($project['options']);
 
             $container->setAlias("mixpanel.{$name}", $id);
             $registry->addMethodCall(
