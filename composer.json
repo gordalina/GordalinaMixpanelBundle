@@ -16,7 +16,7 @@
         "mixpanel/mixpanel-php": "~2.6"
     },
     "require-dev": {
-        "phpspec/phpspec": "~2.1"
+        "phpspec/phpspec": "^3.0"
     },
     "autoload": {
       "psr-0": { "Gordalina\\MixpanelBundle": "" }

@@ -2,18 +2,17 @@
 
 namespace spec\Gordalina\MixpanelBundle\Security;
 
+use Gordalina\MixpanelBundle\ManagerRegistry;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class UserDataSpec extends ObjectBehavior
 {
-    /**
-     * @param Symfony\Component\Security\Core\SecurityContextInterface $securityContext
-     * @param Gordalina\MixpanelBundle\ManagerRegistry $registry
-     */
-    function let($securityContext, $registry)
+    function let(TokenStorageInterface $tokenStorage, ManagerRegistry $registry)
     {
-        $this->beConstructedWith($securityContext, $registry);
+        $this->beConstructedWith($tokenStorage, $registry);
     }
 
     function it_is_initializable()
@@ -21,13 +20,11 @@ class UserDataSpec extends ObjectBehavior
         $this->shouldHaveType('Gordalina\MixpanelBundle\Security\UserData');
     }
 
-    /**
-     * @param Symfony\Component\Security\Core\SecurityContextInterface $securityContext
-     * @param Symfony\Component\Security\Core\Authentication\Token\AnonymousToken $token
-     */
-    function it_should_return_empty_properties_when_user_is_anonymous($securityContext, $token)
-    {
-        $securityContext->getToken()->willReturn($token);
+    function it_should_return_empty_properties_when_user_is_anonymous(
+        TokenStorageInterface $tokenStorage,
+        TokenInterface $token
+    ) {
+        $tokenStorage->getToken()->willReturn($token);
 
         $token->getUser()->willReturn('anon.');
 
