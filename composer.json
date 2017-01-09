@@ -11,8 +11,8 @@
         }
     ],
     "require": {
-        "symfony/framework-bundle": "^3.0",
-        "symfony/security-http": "^3.0",
+        "symfony/framework-bundle": "^2.6|^3.0",
+        "symfony/security-http": "^2.6|^3.0",
         "mixpanel/mixpanel-php": "~2.6"
     },
     "require-dev": {
