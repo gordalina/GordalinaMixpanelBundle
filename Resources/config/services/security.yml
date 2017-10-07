@@ -1,16 +1,16 @@
 services:
     gordalina_mixpanel.security.authentication:
-        class: %gordalina_mixpanel.security.authentication.class%
+        class: "%gordalina_mixpanel.security.authentication.class%"
         arguments:
-            - @gordalina_mixpanel.registry
-            - @gordalina_mixpanel.security.user_data
+            - "@gordalina_mixpanel.registry"
+            - "@gordalina_mixpanel.security.user_data"
         lazy: true
         public: false
 
     gordalina_mixpanel.security.user_data:
-        class: %gordalina_mixpanel.security.user_data.class%
+        class: "%gordalina_mixpanel.security.user_data.class%"
         arguments:
-            - @security.context
-            - @gordalina_mixpanel.registry
+            - "@security.token_storage"
+            - "@gordalina_mixpanel.registry"
         lazy: true
         public: false

@@ -13,7 +13,7 @@ namespace Gordalina\MixpanelBundle\Security;
 
 use Gordalina\MixpanelBundle\ManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class UserData
 {
@@ -30,9 +30,9 @@ class UserData
     private $accessor = null;
 
     /**
-     * @var SecurityContextInterface
+     * @var TokenStorageInterface
      */
-    private $securityContext;
+    private $tokenStorage;
 
     /**
      * @var ManagerRegistry
@@ -40,12 +40,12 @@ class UserData
     private $registry;
 
     /**
-     * @param SecurityContextInterface $securityContext
+     * @param TokenStorageInterface $tokenStorage
      * @param ManagerRegistry          $registry
      */
-    public function __construct(SecurityContextInterface $securityContext, ManagerRegistry $registry)
+    public function __construct(TokenStorageInterface $tokenStorage, ManagerRegistry $registry)
     {
-        $this->securityContext = $securityContext;
+        $this->tokenStorage = $tokenStorage;
         $this->registry = $registry;
     }
 
@@ -125,7 +125,7 @@ class UserData
             return $instance;
         }
 
-        if (null === ($token = $this->securityContext->getToken())) {
+        if (null === ($token = $this->tokenStorage->getToken())) {
             return null;
         }
 

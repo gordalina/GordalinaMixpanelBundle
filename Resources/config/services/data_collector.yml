@@ -1,10 +1,9 @@
 services:
     gordalina_mixpanel.data_collector:
-        class: %gordalina_mixpanel.data_collector.class%
+        class: "%gordalina_mixpanel.data_collector.class%"
         arguments:
-            - @gordalina_mixpanel.registry
-            - @gordalina_mixpanel.flusher
+            - "@gordalina_mixpanel.registry"
+            - "@gordalina_mixpanel.flusher"
         tags:
             - { name: data_collector, template: "GordalinaMixpanelBundle:DataCollector:mixpanel", id: "mixpanel" }
-        lazy: true
         public: false

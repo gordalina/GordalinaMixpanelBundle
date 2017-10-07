@@ -6,18 +6,18 @@ imports:
 
 services:
     gordalina_mixpanel.registry:
-        class: %gordalina_mixpanel.registry.class%
+        class: "%gordalina_mixpanel.registry.class%"
 
     gordalina_mixpanel.flusher:
-        class: %gordalina_mixpanel.flusher.class%
+        class: "%gordalina_mixpanel.flusher.class%"
         arguments:
-            - @gordalina_mixpanel.registry
-            - @?debug.stopwatch
-            - %gordalina_mixpanel.enable_profiler%
+            - "@gordalina_mixpanel.registry"
+            - "@?debug.stopwatch"
+            - "%gordalina_mixpanel.enable_profiler%"
         lazy: true
         public: false
 
     gordalina_mixpanel.expression_language:
-        class: %gordalina_mixpanel.expression_language.class%
+        class: "%gordalina_mixpanel.expression_language.class%"
         lazy: true
         public: false

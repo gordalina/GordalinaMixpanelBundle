@@ -1,9 +1,9 @@
 services:
     gordalina_mixpanel.authentication.listener:
-        class: %gordalina_mixpanel.authentication.listener.class%
+        class: "%gordalina_mixpanel.authentication.listener.class%"
         arguments:
-            - @security.context
-            - @gordalina_mixpanel.security.authentication
+            - "@security.token_storage"
+            - "@gordalina_mixpanel.security.authentication"
         tags:
             - { name: kernel.event_listener, event: security.authentication.success, method: onAuthenticationSuccess, priority: -256 }
             - { name: kernel.event_listener, event: security.interactive_login, method: onInteractiveLogin, priority: -256 }
@@ -13,20 +13,20 @@ services:
         lazy: true
 
     gordalina_mixpanel.controller.listener:
-        class: %gordalina_mixpanel.controller.listener.class%
+        class: "%gordalina_mixpanel.controller.listener.class%"
         arguments:
-            - @annotation_reader
-            - @gordalina_mixpanel.registry
-            - @gordalina_mixpanel.security.user_data
-            - @gordalina_mixpanel.expression_language
+            - "@annotation_reader"
+            - "@gordalina_mixpanel.registry"
+            - "@gordalina_mixpanel.security.user_data"
+            - "@gordalina_mixpanel.expression_language"
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -256 }
         lazy: true
 
     gordalina_mixpanel.finish_request.listener:
-        class: %gordalina_mixpanel.finish_request.listener.class%
+        class: "%gordalina_mixpanel.finish_request.listener.class%"
         arguments:
-            - @gordalina_mixpanel.flusher
+            - "@gordalina_mixpanel.flusher"
         tags:
             - { name: kernel.event_listener, event: kernel.finish_request, method: onFinishRequest, priority: -99 }
         lazy: true
