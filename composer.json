@@ -17,7 +17,8 @@
         "mixpanel/mixpanel-php": "~2.8"
     },
     "require-dev": {
-        "phpspec/phpspec": "^5.0 || ^6.0"
+        "phpspec/phpspec": "^5.0 || ^6.0",
+        "friendsofphp/php-cs-fixer": "^2.16"
     },
     "autoload": {
       "psr-4": { "Gordalina\\MixpanelBundle\\": "" }
