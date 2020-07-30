@@ -40,7 +40,7 @@ class GordalinaMixpanelExtension extends Extension
         $this->loadRegistry($config, $container);
         $this->loadParameters($config, $container);
     }
-    
+
     private function loadRegistry(array $config, ContainerBuilder $container)
     {
         if (array_key_exists('default', $config['projects'])) {
