@@ -207,7 +207,7 @@ e.g: `@Mixpanel\Expression("<expression>")` or `@Mixpanel\Set("<property>", valu
 the current user in `security.context`
 
 
-### Symfony2 Profiler Integration
+### Symfony Profiler Integration
 
 Mixpanel bundle additionally integrates with Symfony2 profiler. You can
 check number of events and engagements sent, total execution time and other information.
@@ -228,7 +228,7 @@ gordalina_mixpanel:
     enable_profiler: %kernel.debug%               # defaults to %kernel.debug%
     projects:
         default:
-            token: 794f0d43f9dbc91e3eb605a5a7bd37ce # required
+            token: xxxxxxxxxxxxxxxxxxxxxxxxxxxx # required
             options:
                 max_batch_size:  50               # the max batch size Mixpanel will accept is 50,
                 max_queue_size:  1000             # the max num of items to hold in memory before flushing
@@ -243,7 +243,7 @@ gordalina_mixpanel:
                 error_callback:  'Doctrine\Common\Util\Debug::dump'
 
         minimum_configuration:
-            token: 794f0d43f9dbc91e3eb605a5a7bd37ce
+            token: xxxxxxxxxxxxxxxxxxxxxxxxxxxx
     users:
         Symfony\Component\Security\Core\User\UserInterface:
             id: username
