@@ -36,26 +36,8 @@ class GordalinaMixpanelExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        $this->registerClassesToCompile();
         $this->loadRegistry($config, $container);
         $this->loadParameters($config, $container);
-    }
-
-    /**
-     * @return null
-     */
-    private function registerClassesToCompile()
-    {
-        $this->addClassesToCompile(array(
-            'Gordalina\MixpanelBundle\Annotation\Annotation',
-            'Gordalina\MixpanelBundle\EventListener\AuthenticationListener',
-            'Gordalina\MixpanelBundle\EventListener\ControllerListener',
-            'Gordalina\MixpanelBundle\EventListener\FinishRequestListener',
-            'Gordalina\MixpanelBundle\Mixpanel\Flusher',
-            'Gordalina\MixpanelBundle\ManagerRegistry',
-            'Gordalina\MixpanelBundle\Security\Authentication',
-            'Gordalina\MixpanelBundle\Security\UserData',
-        ));
     }
 
     /**
