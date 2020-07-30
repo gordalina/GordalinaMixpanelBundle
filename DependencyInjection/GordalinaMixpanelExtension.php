@@ -40,10 +40,7 @@ class GordalinaMixpanelExtension extends Extension
         $this->loadRegistry($config, $container);
         $this->loadParameters($config, $container);
     }
-
-    /**
-     * @return null
-     */
+    
     private function loadRegistry(array $config, ContainerBuilder $container)
     {
         if (array_key_exists('default', $config['projects'])) {
@@ -81,9 +78,6 @@ class GordalinaMixpanelExtension extends Extension
         }
     }
 
-    /**
-     * @return null
-     */
     private function loadParameters(array $config, ContainerBuilder $container)
     {
         $container->setParameter('gordalina_mixpanel.enable_profiler', $config['enable_profiler']);
