@@ -22,7 +22,6 @@
     "autoload": {
       "psr-4": { "Gordalina\\MixpanelBundle\\": "" }
     },
-    "target-dir": "Gordalina/MixpanelBundle",
     "config": {
         "bin-dir": "bin"
     },
