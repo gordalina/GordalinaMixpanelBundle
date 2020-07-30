@@ -2,11 +2,8 @@ GordalinaMixpanelBundle
 =====================
 
 Integration of the [**Mixpanel**](https://github.com/mixpanel/mixpanel-php) library
-into Symfony2.
+into Symfony.
 
-**Important:** this bundle is developed in sync with [Mixpanel's
-repository](https://github.com/mixpanel/mixpanel-php). If you are using Mixpanel
-`2.6`, you need to use the `~2.6` releases of the bundle (or higher if available).
 
 * [Installation](#installation)
 * [Usage](#usage)
@@ -24,7 +21,7 @@ Installation
 Require [`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle) using composer
 
 ```sh
-$ php composer.phar require gordalina/mixpanel-bundle:~2.6
+$ php composer.phar require gordalina/mixpanel-bundle:~3.0
 ```
 
 Or require
@@ -35,25 +32,19 @@ to your `composer.json` file:
 ```json
 {
     "require": {
-        "gordalina/mixpanel-bundle": "@stable"
+        "gordalina/mixpanel-bundle": "~3.0"
     }
 }
 ```
 
-**Protip:** you should browse the
-[`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle)
-page to choose a stable version to use, avoid the `@stable` meta constraint.
-
-Register the bundle in `app/AppKernel.php`:
+Register the bundle in `config/bundles.php`:
 
 ```php
-// app/AppKernel.php
-public function registerBundles()
-{
-    return array(
+// config/bundles.php
+    return [
         // ...
-        new Gordalina\MixpanelBundle\GordalinaMixpanelBundle(),
-    );
+        Gordalina\MixpanelBundle\GordalinaMixpanelBundle::class => ['all' => true],
+    ];
 }
 ```
 
@@ -65,7 +56,7 @@ Enable the bundle's configuration in `app/config/config.yml`:
 gordalina_mixpanel:
     projects:
         default:
-            token: 794f0d43f9dbc91e3eb605a5a7bd37ce
+            token: xxxxxxxxxxxxxxxxxxxx
 ```
 
 Usage
@@ -76,15 +67,18 @@ service which is an instance of `Mixpanel` (from the official library).
 You'll be able to do whatever you want with it.
 
 **NOTE:** This bundle sends your client's ip address automatically. If you have
-a reverse proxy in you servers you should set it in your `config.yml`:
+a reverse proxy in you servers you should set it in your front controller `public/index.php`:
 
-``` yaml
-# app/config/config.yml
-
-framework:
-    trusted_proxies: ['127.0.0.1']
-    # ...
+```php
+// public/index.php
+Request::setTrustedProxies(
+    // the IP address (or range) of your proxy
+    ['192.0.0.1', '10.0.0.0/8'],
+    Request::HEADER_X_FORWARDED_ALL
+);
 ```
+
+You can find more documentation on Symfony website: [How to Configure Symfony to Work behind a Load Balancer or a Reverse Proxy](https://symfony.com/doc/current/deployment/proxies.html#solution-settrustedproxies)
 
 ### Killer Feature
 
@@ -110,7 +104,7 @@ class CheckoutController
 ### Sending people information to Mixpanel
 
 Mixpanel allows you to track your user's behaviours, but also some user information.
-When using annotations which require the [distinct_id](https://mixpanel.com/help/questions/articles/what-is-distinctid),
+When using annotations which require the [distinct_id](https://help.mixpanel.com/hc/en-us/articles/115004509406-What-is-distinct-id-),
 this will be set automatically. This is done automatically provided you have configured it properly.
 You are able to override this value if you wish.
 
@@ -120,7 +114,7 @@ You are able to override this value if you wish.
 gordalina_mixpanel:
     projects:
         default:
-            token: 794f0d43f9dbc91e3eb605a5a7bd37ce
+            token: xxxxxxxxxx
     users:
         Symfony\Component\Security\Core\User\UserInterface:
             id: username
