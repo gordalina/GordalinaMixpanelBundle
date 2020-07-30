@@ -4,6 +4,7 @@ services:
         arguments:
             - "@gordalina_mixpanel.registry"
             - "@gordalina_mixpanel.security.user_data"
+            - "@gordalina_mixpanel.flusher"
         lazy: true
         public: false
 
@@ -12,6 +13,5 @@ services:
         arguments:
             - "@security.token_storage"
             - "@gordalina_mixpanel.registry"
-            - "@gordalina_mixpanel.flusher"
         lazy: true
         public: false
