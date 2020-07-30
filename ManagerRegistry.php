@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle;
 
+use Mixpanel;
+
 class ManagerRegistry
 {
     /**
