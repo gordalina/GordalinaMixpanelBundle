@@ -20,7 +20,7 @@
         "phpspec/phpspec": "^5.0 || ^6.0"
     },
     "autoload": {
-      "psr-0": { "Gordalina\\MixpanelBundle": "" }
+      "psr-4": { "Gordalina\\MixpanelBundle\\": "" }
     },
     "target-dir": "Gordalina/MixpanelBundle",
     "config": {
