@@ -5,5 +5,8 @@ services:
             - "@gordalina_mixpanel.registry"
             - "@gordalina_mixpanel.flusher"
         tags:
-            - { name: data_collector, template: "GordalinaMixpanelBundle:DataCollector:mixpanel", id: "mixpanel" }
+            -
+                name: data_collector
+                template: "@GordalinaMixpanel/DataCollector/mixpanel.html.twig"
+                id: "mixpanel"
         public: false
