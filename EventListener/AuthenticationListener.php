@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Gordalina\MixpanelBundle\EventListener;
 
 use Gordalina\MixpanelBundle\Security\Authentication;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Event\AuthenticationEvent;
@@ -29,40 +29,34 @@ class AuthenticationListener
      */
     private $tokenStorage;
 
+    /**
+     * @var Authentication
+     */
+    private $authentication;
+
     public function __construct(TokenStorageInterface $tokenStorage, Authentication $authentication)
     {
         $this->tokenStorage   = $tokenStorage;
         $this->authentication = $authentication;
     }
 
-    /**
-     * @return null
-     */
     public function onAuthenticationSuccess(AuthenticationEvent $e)
     {
         $this->authentication->onAuthenticationSuccess($e->getAuthenticationToken());
     }
 
-    /**
-     * @return null
-     */
     public function onAuthenticationFailure(AuthenticationFailureEvent $e)
     {
         $this->authentication->onAuthenticationFailure();
     }
 
-    /**
-     * @return null
-     */
     public function onInteractiveLogin(InteractiveLoginEvent $e)
     {
         $this->authentication->onAuthenticationSuccess($e->getAuthenticationToken());
     }
 
-    /**
-     * @return null
-     */
-    public function onKernelRequest(GetResponseEvent $e)
+
+    public function onKernelRequest(RequestEvent $e)
     {
         $token = $this->tokenStorage->getToken();
 
@@ -71,9 +65,6 @@ class AuthenticationListener
         }
     }
 
-    /**
-     * @return null
-     */
     public function onSwitchUser(SwitchUserEvent $e)
     {
         $this->authentication->onAuthenticationFailure();

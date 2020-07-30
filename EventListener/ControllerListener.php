@@ -18,9 +18,10 @@ use Doctrine\Common\Util\ClassUtils;
 use Gordalina\MixpanelBundle\Annotation;
 use Gordalina\MixpanelBundle\ManagerRegistry;
 use Gordalina\MixpanelBundle\Security\UserData;
+use Mixpanel;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class ControllerListener
 {
@@ -52,10 +53,7 @@ class ControllerListener
         $this->expressionLanguage = $expressionLanguage;
     }
 
-    /**
-     * @return null
-     */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event)
     {
         if (!is_array($controller = $event->getController())) {
             return;
@@ -78,11 +76,6 @@ class ControllerListener
         }
     }
 
-    /**
-     * @param AnnotationAnnotation $annotation
-     *
-     * @return null
-     */
     private function prepareAnnotation(Annotation\Annotation $annotation, Request $request)
     {
         foreach ($annotation as $key => $value) {
@@ -96,11 +89,6 @@ class ControllerListener
         }
     }
 
-    /**
-     * @param AnnotationAnnotation $annotation
-     *
-     * @return null
-     */
     private function executeAnnotation(Annotation\Annotation $annotation, Request $request)
     {
         $instance = $this->getMixpanelInstance($annotation->project);
@@ -108,7 +96,7 @@ class ControllerListener
         if ($annotation instanceof Annotation\Track) {
             $instance->track($annotation->event, $annotation->props ?: []);
         } elseif ($annotation instanceof Annotation\Unregister) {
-            $instance->unregister($annotation->prop, $annotation->value);
+            $instance->unregister($annotation->prop);
         } elseif ($annotation instanceof Annotation\Register) {
             $instance->register($annotation->prop, $annotation->value);
         } elseif ($annotation instanceof Annotation\Set) {
