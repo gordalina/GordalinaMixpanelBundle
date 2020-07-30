@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace spec\Gordalina\MixpanelBundle\Mixpanel;
 
 use Gordalina\MixpanelBundle\ManagerRegistry;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 class FlusherSpec extends ObjectBehavior

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -42,21 +44,15 @@ class ControllerListener
      */
     private $expressionLanguage;
 
-    /**
-     * @param Reader          $annotationReader
-     * @param ManagerRegistry $registry
-     * @param UserData        $userData
-     */
     public function __construct(Reader $annotationReader, ManagerRegistry $registry, UserData $userData, ExpressionLanguage $expressionLanguage)
     {
-        $this->annotationReader = $annotationReader;
-        $this->registry = $registry;
-        $this->userData = $userData;
+        $this->annotationReader   = $annotationReader;
+        $this->registry           = $registry;
+        $this->userData           = $userData;
         $this->expressionLanguage = $expressionLanguage;
     }
 
     /**
-     * @param  FilterControllerEvent $event
      * @return null
      */
     public function onKernelController(FilterControllerEvent $event)
@@ -66,13 +62,13 @@ class ControllerListener
         }
 
         $className = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($controller[0]) : get_class($controller[0]);
-        $object = new \ReflectionClass($className);
-        $method = $object->getMethod($controller[1]);
+        $object    = new \ReflectionClass($className);
+        $method    = $object->getMethod($controller[1]);
 
-        $classAnnotations = $this->annotationReader->getClassAnnotations($object);
+        $classAnnotations  = $this->annotationReader->getClassAnnotations($object);
         $methodAnnotations = $this->annotationReader->getMethodAnnotations($method);
 
-        foreach (array($classAnnotations, $methodAnnotations) as $collection) {
+        foreach ([$classAnnotations, $methodAnnotations] as $collection) {
             foreach ($collection as $annotation) {
                 if ($annotation instanceof Annotation\Annotation) {
                     $this->prepareAnnotation($annotation, $event->getRequest());
@@ -83,7 +79,8 @@ class ControllerListener
     }
 
     /**
-     * @param  AnnotationAnnotation $annotation
+     * @param AnnotationAnnotation $annotation
+     *
      * @return null
      */
     private function prepareAnnotation(Annotation\Annotation $annotation, Request $request)
@@ -100,7 +97,8 @@ class ControllerListener
     }
 
     /**
-     * @param  AnnotationAnnotation $annotation
+     * @param AnnotationAnnotation $annotation
+     *
      * @return null
      */
     private function executeAnnotation(Annotation\Annotation $annotation, Request $request)
@@ -108,33 +106,35 @@ class ControllerListener
         $instance = $this->getMixpanelInstance($annotation->project);
 
         if ($annotation instanceof Annotation\Track) {
-            $instance->track($annotation->event, $annotation->props ?: array());
-        } else if ($annotation instanceof Annotation\Unregister) {
+            $instance->track($annotation->event, $annotation->props ?: []);
+        } elseif ($annotation instanceof Annotation\Unregister) {
             $instance->unregister($annotation->prop, $annotation->value);
-        } else if ($annotation instanceof Annotation\Register) {
+        } elseif ($annotation instanceof Annotation\Register) {
             $instance->register($annotation->prop, $annotation->value);
-        } else if ($annotation instanceof Annotation\Set) {
-            $instance->people->set($annotation->id, $annotation->props, $request->getClientIp(), !!$annotation->ignoreTime);
-        } else if ($annotation instanceof Annotation\SetOnce) {
-            $instance->people->setOnce($annotation->id, $annotation->props, $request->getClientIp(), !!$annotation->ignoreTime);
-        } else if ($annotation instanceof Annotation\Remove) {
-            $instance->people->remove($annotation->id, $annotation->prop, $annotation->value, $request->getClientIp(), !!$annotation->ignoreTime);
-        } else if ($annotation instanceof Annotation\Increment) {
-            $instance->people->increment($annotation->id, $annotation->prop, $annotation->value, $request->getClientIp(), !!$annotation->ignoreTime);
-        } else if ($annotation instanceof Annotation\Append) {
-            $instance->people->append($annotation->id, $annotation->prop, $annotation->value, $request->getClientIp(), !!$annotation->ignoreTime);
-        } else if ($annotation instanceof Annotation\TrackCharge) {
-            $instance->people->trackCharge($annotation->id, $annotation->amount, $timestamp = null, $request->getClientIp(), !!$annotation->ignoreTime);
-        } else if ($annotation instanceof Annotation\ClearCharges) {
-            $instance->people->clearCharges($annotation->id, $request->getClientIp(), !!$annotation->ignoreTime);
-        } else if ($annotation instanceof Annotation\UpdateUser) {
+        } elseif ($annotation instanceof Annotation\Set) {
+            $instance->people->set($annotation->id, $annotation->props, $request->getClientIp(), (bool) $annotation->ignoreTime);
+        } elseif ($annotation instanceof Annotation\SetOnce) {
+            $instance->people->setOnce($annotation->id, $annotation->props, $request->getClientIp(), (bool) $annotation->ignoreTime);
+        } elseif ($annotation instanceof Annotation\Remove) {
+            $instance->people->remove($annotation->id, $annotation->prop, $annotation->value, $request->getClientIp(), (bool) $annotation->ignoreTime);
+        } elseif ($annotation instanceof Annotation\Increment) {
+            $instance->people->increment($annotation->id, $annotation->prop, $annotation->value, $request->getClientIp(), (bool) $annotation->ignoreTime);
+        } elseif ($annotation instanceof Annotation\Append) {
+            $instance->people->append($annotation->id, $annotation->prop, $annotation->value, $request->getClientIp(), (bool) $annotation->ignoreTime);
+        } elseif ($annotation instanceof Annotation\TrackCharge) {
+            $instance->people->trackCharge($annotation->id, $annotation->amount, $timestamp = null, $request->getClientIp(), (bool) $annotation->ignoreTime);
+        } elseif ($annotation instanceof Annotation\ClearCharges) {
+            $instance->people->clearCharges($annotation->id, $request->getClientIp(), (bool) $annotation->ignoreTime);
+        } elseif ($annotation instanceof Annotation\UpdateUser) {
             $instance->people->set($this->getId(), $this->getUserProperties(), $request->getClientIp());
-        } else if ($annotation instanceof Annotation\DeleteUser) {
-            $instance->people->deleteUser($annotation->id, $request->getClientIp(), !!$annotation->ignoreTime);
+        } elseif ($annotation instanceof Annotation\DeleteUser) {
+            $instance->people->deleteUser($annotation->id, $request->getClientIp(), (bool) $annotation->ignoreTime);
         }
     }
+
     /**
-     * @param  string $project
+     * @param string $project
+     *
      * @return Mixpanel
      */
     private function getMixpanelInstance($project = null)

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -29,33 +31,29 @@ class Flusher
     /**
      * @var array
      */
-    private $data = array();
+    private $data = [];
 
     /**
-     * @var integer
+     * @var int
      */
     private $time;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $enableProfiler;
 
     /**
-     * @param ManagerRegistry $registry
-     * @param Stopwatch       $stopwatch      defaults to null
-     * @param boolean         $enableProfiler defaults to false
+     * @param Stopwatch $stopwatch      defaults to null
+     * @param bool      $enableProfiler defaults to false
      */
     public function __construct(ManagerRegistry $registry, Stopwatch $stopwatch = null, $enableProfiler = false)
     {
-        $this->registry = $registry;
-        $this->stopwatch = $stopwatch ?: new Stopwatch();
+        $this->registry       = $registry;
+        $this->stopwatch      = $stopwatch ?: new Stopwatch();
         $this->enableProfiler = $enableProfiler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function flush()
     {
         if (!$this->enableProfiler) {
@@ -74,7 +72,7 @@ class Flusher
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getTime()
     {
@@ -83,6 +81,7 @@ class Flusher
 
     /**
      * @see http://en.wikipedia.org/wiki/Glossary_of_poker_terms#poker_face
+     *
      * @return null
      */
     private function straightFlush()
@@ -101,10 +100,10 @@ class Flusher
         // get data from the queue
         foreach ($this->registry->getProjects() as $id => $project) {
             if (!isset($this->data[$id])) {
-                $this->data[$id] = array(
-                    'events' => array(),
-                    'people' => array(),
-                );
+                $this->data[$id] = [
+                    'events' => [],
+                    'people' => [],
+                ];
             }
 
             $this->data[$id]['events'] = array_merge($this->data[$id]['events'], $this->getQueue($project, '_events', false));
@@ -112,7 +111,7 @@ class Flusher
         }
 
         // log the time spent flushing
-        $key = sprintf("%s::flush", get_class($this->registry));
+        $key = sprintf('%s::flush', get_class($this->registry));
         $this->stopwatch->start($key);
 
         $this->straightFlush();
@@ -124,16 +123,17 @@ class Flusher
     /**
      * This is quite a hack, but gets the job done.
      *
-     * @param  MixPanel $project
-     * @param  string   $propertyName
-     * @param  boolean  $isAccessible
+     * @param MixPanel $project
+     * @param string   $propertyName
+     * @param bool     $isAccessible
+     *
      * @return array
      */
     private function getQueue(\MixPanel $project, $propertyName, $isAccessible)
     {
-        $queue = array();
+        $queue = [];
 
-        $rfl = new \ReflectionClass($project);
+        $rfl      = new \ReflectionClass($project);
         $property = $rfl->getProperty($propertyName);
 
         if (!$isAccessible) {

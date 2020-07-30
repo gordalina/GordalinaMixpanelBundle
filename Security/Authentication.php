@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -19,17 +21,13 @@ class Authentication
     /**
      * @var ManagerRegistry
      */
-    private $managerRegistry;
+    private $registry;
 
     /**
      * @var UserData
      */
     private $userData;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param UserData        $userData
-     */
     public function __construct(ManagerRegistry $registry, UserData $userData)
     {
         $this->registry = $registry;
@@ -37,8 +35,7 @@ class Authentication
     }
 
     /**
-     * @param  TokenInterface $token
-     * @return boolean
+     * @return bool
      */
     public function onAuthenticationSuccess(TokenInterface $token)
     {

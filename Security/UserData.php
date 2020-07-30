@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -20,7 +22,7 @@ class UserData
     /**
      * @var array
      */
-    private $properties = array();
+    private $properties = [];
 
     /**
      * Lazy loaded
@@ -39,18 +41,15 @@ class UserData
      */
     private $registry;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param ManagerRegistry          $registry
-     */
     public function __construct(TokenStorageInterface $tokenStorage, ManagerRegistry $registry)
     {
         $this->tokenStorage = $tokenStorage;
-        $this->registry = $registry;
+        $this->registry     = $registry;
     }
 
     /**
-     * @param  object $instance
+     * @param object $instance
+     *
      * @return mixed
      */
     public function getId($instance = null)
@@ -61,13 +60,14 @@ class UserData
     }
 
     /**
-     * @param  object $instance
-     * @param  string $property id|first_name|last_name|email|phone
+     * @param object $instance
+     * @param string $property id|first_name|last_name|email|phone
+     *
      * @return mixed
      */
     public function getProperty($instance, $property = null)
     {
-        if ($property === null) {
+        if (null === $property) {
             $property = $instance;
             $instance = $this->getUser();
         }
@@ -82,14 +82,15 @@ class UserData
     }
 
     /**
-     * @param  object $instance
+     * @param object $instance
+     *
      * @return array
      */
     public function getProperties($instance = null)
     {
         $instance = $this->getUser($instance);
         if (empty($instance) || !is_object($instance)) {
-            return array();
+            return [];
         }
         $className = get_class($instance);
 
@@ -103,8 +104,7 @@ class UserData
                     $this->accessor = PropertyAccess::createPropertyAccessor();
                 }
 
-                $this->properties[$className] = array();
-
+                $this->properties[$className] = [];
 
                 foreach ($properties as $key => $prop) {
                     $this->properties[$className][$key] = $this->accessor->getValue($instance, $prop);
@@ -116,12 +116,13 @@ class UserData
     }
 
     /**
-     * @param  object|null $instance
+     * @param object|null $instance
+     *
      * @return object|null
      */
     public function getUser($instance = null)
     {
-        if ($instance !== null) {
+        if (null !== $instance) {
             return $instance;
         }
 

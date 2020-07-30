@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -11,8 +13,8 @@
 
 namespace Gordalina\MixpanelBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -40,9 +42,6 @@ class GordalinaMixpanelExtension extends Extension
     }
 
     /**
-     * @param array            $config
-     * @param ContainerBuilder $container
-     *
      * @return null
      */
     private function loadRegistry(array $config, ContainerBuilder $container)
@@ -71,11 +70,11 @@ class GordalinaMixpanelExtension extends Extension
             $registry->addMethodCall('setConfig', [$id, $project]);
         }
 
-        $container->setAlias("mixpanel.default", "gordalina_mixpanel.{$default}");
-        $container->setAlias("mixpanel", "gordalina_mixpanel.{$default}");
+        $container->setAlias('mixpanel.default', "gordalina_mixpanel.{$default}");
+        $container->setAlias('mixpanel', "gordalina_mixpanel.{$default}");
 
-        $registry->addMethodCall('addAlias', ["mixpanel.default", "gordalina_mixpanel.{$default}"]);
-        $registry->addMethodCall('addAlias', ["mixpanel", "gordalina_mixpanel.{$default}"]);
+        $registry->addMethodCall('addAlias', ['mixpanel.default', "gordalina_mixpanel.{$default}"]);
+        $registry->addMethodCall('addAlias', ['mixpanel', "gordalina_mixpanel.{$default}"]);
 
         foreach ($config['users'] as $class => $user) {
             $registry->addMethodCall('addUser', [$class, $user]);
@@ -83,9 +82,6 @@ class GordalinaMixpanelExtension extends Extension
     }
 
     /**
-     * @param array            $config
-     * @param ContainerBuilder $container
-     *
      * @return null
      */
     private function loadParameters(array $config, ContainerBuilder $container)

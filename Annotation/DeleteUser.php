@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -25,7 +27,7 @@ final class DeleteUser extends Annotation
     public $id;
 
     /**
-     * @var boolean
+     * @var bool
      */
     public $ignoreTime;
 }

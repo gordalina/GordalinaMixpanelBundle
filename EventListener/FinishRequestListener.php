@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -21,16 +23,12 @@ class FinishRequestListener
      */
     private $flusher;
 
-    /**
-     * @param Flusher $flusher
-     */
     public function __construct(Flusher $flusher)
     {
         $this->flusher = $flusher;
     }
 
     /**
-     * @param  FinishRequestEvent $e
      * @return null
      */
     public function onFinishRequest(FinishRequestEvent $e)

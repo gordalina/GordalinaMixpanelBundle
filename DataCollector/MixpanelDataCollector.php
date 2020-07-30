@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -12,11 +14,11 @@
 namespace Gordalina\MixpanelBundle\DataCollector;
 
 use Gordalina\MixpanelBundle\ManagerRegistry;
+use Gordalina\MixpanelBundle\Mixpanel\Flusher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
-use Gordalina\MixpanelBundle\Mixpanel\Flusher;
 
 class MixpanelDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -30,10 +32,6 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
      */
     private $flusher;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param Flusher         $flusher
-     */
     public function __construct(ManagerRegistry $registry, Flusher $flusher)
     {
         $this->registry = $registry;
@@ -67,7 +65,7 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getTotal()
     {
@@ -89,7 +87,7 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getEventCount()
     {
@@ -104,7 +102,7 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getEngagementCount()
     {
@@ -175,7 +173,7 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getTime()
     {

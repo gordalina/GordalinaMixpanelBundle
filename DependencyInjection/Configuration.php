@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -22,12 +24,12 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * @var boolean
+     * @var bool
      */
     private $debug;
 
     /**
-     * @param boolean $debug
+     * @param bool $debug
      */
     public function __construct($debug)
     {
@@ -40,7 +42,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('gordalina_mixpanel');
+        $rootNode    = $treeBuilder->root('gordalina_mixpanel');
 
         $rootNode
             ->children()
@@ -53,7 +55,7 @@ class Configuration implements ConfigurationInterface
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return is_string($v) && strlen($v) > 0; })
                             ->then(function ($v) {
-                                return array('id' => $v);
+                                return ['id' => $v];
                             })
                         ->end()
                         ->children()
@@ -83,7 +85,7 @@ class Configuration implements ConfigurationInterface
     public function addMixpanelOptionsNode()
     {
         $builder = new TreeBuilder();
-        $node = $builder->root('options');
+        $node    = $builder->root('options');
 
         $node
             ->addDefaultsIfNotSet()
@@ -104,7 +106,7 @@ class Configuration implements ConfigurationInterface
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return is_string($v) && strlen($v) > 0; })
                             ->then(function ($v) {
-                                return array('class' => $v);
+                                return ['class' => $v];
                             })
                         ->end()
                         ->children()
