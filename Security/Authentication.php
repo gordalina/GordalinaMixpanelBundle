@@ -34,9 +34,6 @@ class Authentication
         $this->userData = $userData;
     }
 
-    /**
-     * @return bool
-     */
     public function onAuthenticationSuccess(TokenInterface $token)
     {
         if (null === ($user = $token->getUser())) {
