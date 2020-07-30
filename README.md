@@ -109,7 +109,7 @@ this will be set automatically. This is done automatically provided you have con
 You are able to override this value if you wish.
 
 ```yaml
-# app/config/config.yml
+# config/packages/gordolina_mixpanel.yaml
 
 gordalina_mixpanel:
     projects:
