@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Gordalina\MixpanelBundle\Mixpanel;
 
 use Gordalina\MixpanelBundle\ManagerRegistry;
+use Mixpanel;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 class Flusher
@@ -43,11 +44,7 @@ class Flusher
      */
     private $enableProfiler;
 
-    /**
-     * @param Stopwatch $stopwatch      defaults to null
-     * @param bool      $enableProfiler defaults to false
-     */
-    public function __construct(ManagerRegistry $registry, Stopwatch $stopwatch = null, $enableProfiler = false)
+    public function __construct(ManagerRegistry $registry, Stopwatch $stopwatch = null, bool $enableProfiler = false)
     {
         $this->registry       = $registry;
         $this->stopwatch      = $stopwatch ?: new Stopwatch();
@@ -81,8 +78,6 @@ class Flusher
 
     /**
      * @see http://en.wikipedia.org/wiki/Glossary_of_poker_terms#poker_face
-     *
-     * @return null
      */
     private function straightFlush()
     {
@@ -92,9 +87,6 @@ class Flusher
         }
     }
 
-    /**
-     * @return null
-     */
     private function dataCollectorFlush()
     {
         // get data from the queue
@@ -122,14 +114,8 @@ class Flusher
 
     /**
      * This is quite a hack, but gets the job done.
-     *
-     * @param MixPanel $project
-     * @param string   $propertyName
-     * @param bool     $isAccessible
-     *
-     * @return array
      */
-    private function getQueue(\MixPanel $project, $propertyName, $isAccessible)
+    private function getQueue(Mixpanel $project, string $propertyName, bool $isAccessible): array
     {
         $queue = [];
 
