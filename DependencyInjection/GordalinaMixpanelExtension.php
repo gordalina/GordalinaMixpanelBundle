@@ -16,7 +16,6 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -31,7 +30,7 @@ class GordalinaMixpanelExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration($container->getParameter('kernel.debug'));
-        $config = $this->processConfiguration($configuration, $configs);
+        $config        = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
@@ -41,8 +40,9 @@ class GordalinaMixpanelExtension extends Extension
     }
 
     /**
-     * @param  array            $config
-     * @param  ContainerBuilder $container
+     * @param array            $config
+     * @param ContainerBuilder $container
+     *
      * @return null
      */
     private function loadRegistry(array $config, ContainerBuilder $container)
@@ -66,25 +66,26 @@ class GordalinaMixpanelExtension extends Extension
             $container->setAlias("mixpanel.{$name}", $id);
             $registry->addMethodCall(
                 'addProject',
-                array($id, "mixpanel.{$name}", new Reference($id))
+                [$id, "mixpanel.{$name}", new Reference($id)]
             );
-            $registry->addMethodCall('setConfig', array($id, $project));
+            $registry->addMethodCall('setConfig', [$id, $project]);
         }
 
         $container->setAlias("mixpanel.default", "gordalina_mixpanel.{$default}");
         $container->setAlias("mixpanel", "gordalina_mixpanel.{$default}");
 
-        $registry->addMethodCall('addAlias', array("mixpanel.default", "gordalina_mixpanel.{$default}"));
-        $registry->addMethodCall('addAlias', array("mixpanel", "gordalina_mixpanel.{$default}"));
+        $registry->addMethodCall('addAlias', ["mixpanel.default", "gordalina_mixpanel.{$default}"]);
+        $registry->addMethodCall('addAlias', ["mixpanel", "gordalina_mixpanel.{$default}"]);
 
         foreach ($config['users'] as $class => $user) {
-            $registry->addMethodCall('addUser', array($class, $user));
+            $registry->addMethodCall('addUser', [$class, $user]);
         }
     }
 
     /**
-     * @param  array            $config
-     * @param  ContainerBuilder $container
+     * @param array            $config
+     * @param ContainerBuilder $container
+     *
      * @return null
      */
     private function loadParameters(array $config, ContainerBuilder $container)
