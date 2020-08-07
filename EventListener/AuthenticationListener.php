@@ -60,7 +60,7 @@ class AuthenticationListener
     {
         $token = $this->tokenStorage->getToken();
 
-        if ($token instanceof TokenInterface) {
+        if ($e->isMasterRequest() && $token instanceof TokenInterface) {
             $this->authentication->onAuthenticationSuccess($token);
         }
     }
