@@ -144,4 +144,12 @@ class ControllerListener
 
         return $props;
     }
+
+    /**
+     * @return int|null
+     */
+    private function getId()
+    {
+        return $this->userData->getId();
+    }
 }
