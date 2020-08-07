@@ -79,13 +79,37 @@ class ControllerListener
     private function prepareAnnotation(Annotation\Annotation $annotation, Request $request)
     {
         foreach ($annotation as $key => $value) {
-            if ($value instanceof Annotation\Id) {
-                $annotation->$key = $this->userData->getId();
+            if (is_array($value)) {
+                foreach ($value as $key2 => $value2) {
+                    $this->updateDataAnnotation($annotation, $request, $key2, $value2, $key);
+                }
+                continue;
             }
 
-            if ($value instanceof Annotation\Expression) {
-                $annotation->$key = $this->expressionLanguage->evaluate($value->expression, $request->attributes->all());
-            }
+            $this->updateDataAnnotation($annotation, $request, $key, $value);
+        }
+    }
+
+    private function updateDataAnnotation(Annotation\Annotation $annotation, Request $request, string $key, $value, ?string $parentKey = null)
+    {
+        $element = null;
+
+        if ($value instanceof Annotation\Id) {
+            $element = $this->userData->getId();
+        }
+
+        if ($value instanceof Annotation\Expression) {
+            $element = $this->expressionLanguage->evaluate($value->expression, $request->attributes->all());
+        }
+
+        if ($element === null) {
+            return;
+        }
+
+        if ($parentKey !== null) {
+            $annotation->$parentKey[$key] = $element;
+        } else {
+            $annotation->$key = $element;
         }
     }
 
