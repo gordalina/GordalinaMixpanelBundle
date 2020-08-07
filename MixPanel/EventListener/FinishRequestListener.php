@@ -11,9 +11,9 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\EventListener;
+namespace Gordalina\MixpanelBundle\MixPanel\EventListener;
 
-use Gordalina\MixpanelBundle\Mixpanel\Flusher;
+use Gordalina\MixpanelBundle\MixPanel\Mixpanel\Flusher;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 
 class FinishRequestListener

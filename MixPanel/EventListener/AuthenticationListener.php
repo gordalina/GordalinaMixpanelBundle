@@ -11,11 +11,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\EventListener;
+namespace Gordalina\MixpanelBundle\MixPanel\EventListener;
 
-use Gordalina\MixpanelBundle\ManagerRegistry;
-use Gordalina\MixpanelBundle\Security\Authentication;
-use Gordalina\MixpanelBundle\Security\UserData;
+use Gordalina\MixpanelBundle\MixPanel\ManagerRegistry;
+use Gordalina\MixpanelBundle\MixPanel\Security\Authentication;
+use Gordalina\MixpanelBundle\MixPanel\Security\UserData;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -45,6 +45,7 @@ class AuthenticationListener
      * @var UserData
      */
     private $userData;
+
     /**
      * @var bool
      */

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\DependencyInjection;
 
+use Gordalina\MixpanelBundle\MixPanel\ManagerRegistry;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -49,7 +50,7 @@ class GordalinaMixpanelExtension extends Extension
             $default = key($config['projects']);
         }
 
-        $registry = $container->getDefinition('gordalina_mixpanel.registry');
+        $registry = $container->getDefinition(ManagerRegistry::class);
 
         foreach ($config['projects'] as $name => $project) {
             $id = "gordalina_mixpanel.{$name}";

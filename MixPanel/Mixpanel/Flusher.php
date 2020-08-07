@@ -11,9 +11,9 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Mixpanel;
+namespace Gordalina\MixpanelBundle\MixPanel\Mixpanel;
 
-use Gordalina\MixpanelBundle\ManagerRegistry;
+use Gordalina\MixpanelBundle\MixPanel\ManagerRegistry;
 use Mixpanel;
 use Symfony\Component\Stopwatch\Stopwatch;
 
