@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\EventListener;
 
+use Gordalina\MixpanelBundle\ManagerRegistry;
 use Gordalina\MixpanelBundle\Security\Authentication;
+use Gordalina\MixpanelBundle\Security\UserData;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -34,10 +36,27 @@ class AuthenticationListener
      */
     private $authentication;
 
-    public function __construct(TokenStorageInterface $tokenStorage, Authentication $authentication)
+    /**
+     * @var ManagerRegistry
+     */
+    private $registry;
+
+    /**
+     * @var UserData
+     */
+    private $userData;
+    /**
+     * @var bool
+     */
+    private $autoUpdateUser;
+
+    public function __construct(TokenStorageInterface $tokenStorage, Authentication $authentication, ManagerRegistry $registry, UserData $userData, bool $autoUpdateUser)
     {
         $this->tokenStorage   = $tokenStorage;
         $this->authentication = $authentication;
+        $this->registry       = $registry;
+        $this->userData       = $userData;
+        $this->autoUpdateUser = $autoUpdateUser;
     }
 
     public function onAuthenticationSuccess(AuthenticationEvent $e)
@@ -62,6 +81,18 @@ class AuthenticationListener
 
         if ($e->isMasterRequest() && $token instanceof TokenInterface) {
             $this->authentication->onAuthenticationSuccess($token);
+
+            if (!$this->autoUpdateUser) {
+                return;
+            }
+
+            $userId = $this->userData->getId();
+            $properties = $this->userData->getProperties();
+            unset($properties['id']);
+            /** @var \Mixpanel $project */
+            foreach ($this->registry->getProjects() as $project) {
+                $project->people->set($userId, $properties, $e->getRequest()->getClientIp());
+            }
         }
     }
 

@@ -46,6 +46,9 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->booleanNode('auto_update_user')
+                    ->defaultValue($this->debug)
+                ->end()
                 ->booleanNode('enable_profiler')
                     ->defaultValue($this->debug)
                 ->end()
