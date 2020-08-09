@@ -107,7 +107,7 @@ class UserData
                 $this->properties[$className] = [];
 
                 foreach ($properties as $key => $prop) {
-                    if ($key === 'extra_data') {
+                    if ('extra_data' === $key) {
                         foreach ($prop as $element) {
                             $this->properties[$className][$element['key']] = $this->accessor->getValue($instance, $element['value']);
                         }

@@ -102,11 +102,11 @@ class ControllerListener
             $element = $this->expressionLanguage->evaluate($value->expression, $request->attributes->all());
         }
 
-        if ($element === null) {
+        if (null === $element) {
             return;
         }
 
-        if ($parentKey !== null) {
+        if (null !== $parentKey) {
             $annotation->$parentKey[$key] = $element;
         } else {
             $annotation->$key = $element;

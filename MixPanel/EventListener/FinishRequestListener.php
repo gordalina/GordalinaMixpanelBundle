@@ -28,7 +28,6 @@ class FinishRequestListener
         $this->flusher = $flusher;
     }
 
-
     public function onFinishRequest(FinishRequestEvent $e)
     {
         $this->flusher->flush();

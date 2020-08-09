@@ -16,7 +16,7 @@ class MixPanelEvent extends Event
     public function __construct(Annotation $annotation, Request $request)
     {
         $this->annotation = $annotation;
-        $this->request = $request;
+        $this->request    = $request;
     }
 
     public function getAnnotation(): Annotation

@@ -75,7 +75,6 @@ class AuthenticationListener
         $this->authentication->onAuthenticationSuccess($e->getAuthenticationToken());
     }
 
-
     public function onKernelRequest(RequestEvent $e)
     {
         $token = $this->tokenStorage->getToken();
@@ -87,7 +86,7 @@ class AuthenticationListener
                 return;
             }
 
-            $userId = $this->userData->getId();
+            $userId     = $this->userData->getId();
             $properties = $this->userData->getProperties();
             unset($properties['id']);
             /** @var \Mixpanel $project */

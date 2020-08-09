@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\MixPanel;
 
-use Mixpanel;
-
 class ManagerRegistry
 {
     /**
@@ -38,9 +36,8 @@ class ManagerRegistry
     private $users = [];
 
     /**
-     * @param string   $id
-     * @param string   $alias
-     * @param Mixpanel $project
+     * @param string $id
+     * @param string $alias
      */
     public function addProject($id, $alias, \Mixpanel $project)
     {
