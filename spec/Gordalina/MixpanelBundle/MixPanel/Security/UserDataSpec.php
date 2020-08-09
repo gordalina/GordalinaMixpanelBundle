@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace spec\Gordalina\MixpanelBundle\Security;
+namespace spec\Gordalina\MixpanelBundle\MixPanel\Security;
 
-use Gordalina\MixpanelBundle\ManagerRegistry;
+use Gordalina\MixpanelBundle\MixPanel\ManagerRegistry;
 use PhpSpec\ObjectBehavior;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -18,7 +18,7 @@ class UserDataSpec extends ObjectBehavior
 
     public function it_is_initializable()
     {
-        $this->shouldHaveType('Gordalina\MixpanelBundle\Security\UserData');
+        $this->shouldHaveType('Gordalina\MixpanelBundle\MixPanel\Security\UserData');
     }
 
     public function it_should_return_empty_properties_when_user_is_anonymous(
