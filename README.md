@@ -95,7 +95,7 @@ class CheckoutController
     /**
      * @Mixpanel\Track("View Checkout")
      */
-    public function viewAction(Request $request)
+    public function view(Request $request)
     {
         // ...
     }
@@ -127,12 +127,15 @@ gordalina_mixpanel:
             last_name: last_name
             email: email
             phone: phone
+            extra_data:
+                - { key: whatever, value: test }
 ```
 
 This bundle uses property access to get the values out of the user object, so
 event if you dont have a `first_name` property, but have a `getFirstName` method
 it will work.
 
+**NOTE:** ``extra_data`` corresponding non-default properties in MixPanel user profile
 
 ```php
 <?php
@@ -145,7 +148,7 @@ class UserController
     /**
      * @Mixpanel\UpdateUser()
      */
-    public function userUpdatedAction(User $user, Request $request)
+    public function userUpdated(User $user, Request $request)
     {
         // ...
     }
@@ -166,10 +169,15 @@ use Gordalina\MixpanelBundle\Annotation as Mixpanel;
 class OrderController
 {
     /**
-     * @Mixpanel\Track("Order Completed")
-     * @Mixpanel\TrackCharge(id=@Mixpanel\Expression("user.getId()"), amount=@Mixpanel\Expression("order.getAmount()"))
+     * @Mixpanel\Track("Order Completed", props={
+     *      "user": @Mixpanel\Expression("user.getId()")
+     * })
+     * @Mixpanel\TrackCharge(
+     *      id=@Mixpanel\Expression("user.getId()"),
+     *      amount=@Mixpanel\Expression("order.getAmount()")
+     * )
      */
-    public function orderCompletedAction(Order $order, Request $request)
+    public function orderCompleted(Order $order, Request $request)
     {
         // ...
     }
@@ -206,6 +214,97 @@ e.g: `@Mixpanel\Expression("<expression>")` or `@Mixpanel\Set("<property>", valu
 **Note**: All `id` properties can be omitted, as they will be set with the id of
 the current user in `security.context`
 
+### MixPanelEvent
+
+You can also send an event through symfony events when the annotations are not sufficient like this:
+```php
+#In controller
+namespace myNamespace;
+
+use Gordalina\MixpanelBundle\Annotation as Annotation;
+use Gordalina\MixpanelBundle\MixPanel\Event\MixPanelEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+// ...
+
+public function edit(User $user, EventDispatcherInterface $eventDispatcher, Request $request)
+{
+    // Your code
+    $annotation = new Annotation\Track();
+    $annotation->event = 'My event';
+    $annotation->props = [
+        'prop 1' => 'data 1',
+        'prop 2' => 'data 2',
+    ];
+    
+    $eventDispatcher->dispatch(new MixPanelEvent($annotation, $request));
+    // Rest of your code
+}
+```
+
+### Override Props in all Annotations
+
+In all your annotations, you can have something like this:
+```php
+    /**
+     * @Mixpanel\Track("Your event", props={
+     *      "element": "something"
+     * })
+     */
+    public function yourAction()
+    {
+        // ...
+    }
+```
+It can be annoying to always have to put the same properties in your annotations. The functioning of the events allows us to avoid that.
+
+```php
+namespace YourNamespace;
+
+use Doctrine\Common\Annotations\Reader;
+use Gordalina\MixpanelBundle\Annotation;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+
+class MixPanelListener
+{
+    private $annotationReader;
+
+    public function __construct(Reader $annotationReader)
+    {
+        $this->annotationReader = $annotationReader;
+    }
+
+    public function onKernelController(ControllerEvent $event)
+    {
+        if (!\is_array($controller = $event->getController())) {
+            return;
+        }
+
+        $className = \get_class($controller[0]);
+        $object    = new \ReflectionClass($className);
+        $method    = $object->getMethod($controller[1]);
+
+        $classAnnotations  = $this->annotationReader->getClassAnnotations($object);
+        $methodAnnotations = $this->annotationReader->getMethodAnnotations($method);
+
+        foreach ([$classAnnotations, $methodAnnotations] as $collection) {
+            foreach ($collection as $annotation) {
+                if ($annotation instanceof Annotation\Annotation && property_exists($annotation, 'props')) {
+                    $annotation->props['element'] = 'something';
+                }
+            }
+        }
+    }
+}
+```
+
+And in your config:
+```yaml
+    YourNamespace\MixPanelListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -200 }
+```
+
 
 ### Symfony Profiler Integration
 
@@ -226,6 +325,7 @@ You'll find the reference configuration below:
 
 gordalina_mixpanel:
     enable_profiler: %kernel.debug%               # defaults to %kernel.debug%
+    auto_update_user: %kernel.debug%              # defaults to %kernel.debug%
     projects:
         default:
             token: xxxxxxxxxxxxxxxxxxxxxxxxxxxx # required
