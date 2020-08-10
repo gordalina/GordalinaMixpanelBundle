@@ -5,6 +5,7 @@ services:
         autoconfigure: true
         public: false
         bind:
+            $sendDataToMixpanel: '%gordalina_mixpanel.enabled%'
             $autoUpdateUser: '%gordalina_mixpanel.auto_update_user%'
             $enableProfiler: '%gordalina_mixpanel.enable_profiler%'
 

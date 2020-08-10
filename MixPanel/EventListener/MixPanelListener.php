@@ -22,10 +22,16 @@ class MixPanelListener implements EventSubscriberInterface
      */
     private $userData;
 
-    public function __construct(ManagerRegistry $registry, UserData $userData)
+    /**
+     * @var bool
+     */
+    private $sendDataToMixpanel;
+
+    public function __construct(ManagerRegistry $registry, UserData $userData, bool $sendDataToMixpanel)
     {
-        $this->registry = $registry;
-        $this->userData = $userData;
+        $this->registry           = $registry;
+        $this->userData           = $userData;
+        $this->sendDataToMixpanel = $sendDataToMixpanel;
     }
 
     public static function getSubscribedEvents()
@@ -37,6 +43,10 @@ class MixPanelListener implements EventSubscriberInterface
 
     public function sendEvent(MixPanelEvent $event)
     {
+        if (!$this->sendDataToMixpanel) {
+            return;
+        }
+
         $annotation = $event->getAnnotation();
         $request    = $event->getRequest();
         $instance   = $this->getMixpanelInstance($annotation->project);

@@ -46,6 +46,10 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
+                ->booleanNode('enabled')
+                    ->info('Send Data to Mixpanel')
+                    ->defaultValue(true)
+                ->end()
                 ->booleanNode('auto_update_user')
                     ->info('Send data user on each master request (useful if you do not force users to disconnect when setting up the bundle or add new properties in their profile. WARNING: preferred used @Mixpanel\UpdateUser() or @Mixpanel\Set() at connexion for performances)')
                     ->defaultValue($this->debug)

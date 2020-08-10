@@ -324,6 +324,7 @@ You'll find the reference configuration below:
 # app/config/config*.yml
 
 gordalina_mixpanel:
+    enabled: true                                 # defaults to true
     enable_profiler: %kernel.debug%               # defaults to %kernel.debug%
     auto_update_user: %kernel.debug%              # defaults to %kernel.debug%
     projects:
