@@ -51,13 +51,19 @@ class AuthenticationListener
      */
     private $autoUpdateUser;
 
-    public function __construct(TokenStorageInterface $tokenStorage, Authentication $authentication, ManagerRegistry $registry, UserData $userData, bool $autoUpdateUser)
+    /**
+     * @var bool
+     */
+    private $sendDataToMixpanel;
+
+    public function __construct(TokenStorageInterface $tokenStorage, Authentication $authentication, ManagerRegistry $registry, UserData $userData, bool $autoUpdateUser, bool $sendDataToMixpanel)
     {
-        $this->tokenStorage   = $tokenStorage;
-        $this->authentication = $authentication;
-        $this->registry       = $registry;
-        $this->userData       = $userData;
-        $this->autoUpdateUser = $autoUpdateUser;
+        $this->tokenStorage       = $tokenStorage;
+        $this->authentication     = $authentication;
+        $this->registry           = $registry;
+        $this->userData           = $userData;
+        $this->autoUpdateUser     = $autoUpdateUser;
+        $this->sendDataToMixpanel = $sendDataToMixpanel;
     }
 
     public function onAuthenticationSuccess(AuthenticationEvent $e)
@@ -82,7 +88,7 @@ class AuthenticationListener
         if ($e->isMasterRequest() && $token instanceof TokenInterface) {
             $this->authentication->onAuthenticationSuccess($token);
 
-            if (!$this->autoUpdateUser) {
+            if (!$this->autoUpdateUser || !$this->sendDataToMixpanel) {
                 return;
             }
 
