@@ -19,7 +19,7 @@
     },
     "require-dev": {
         "phpspec/phpspec": "^6.2",
-        "friendsofphp/php-cs-fixer": "^2.16"
+        "friendsofphp/php-cs-fixer": "^2.16.4"
     },
     "autoload": {
       "psr-4": { "Gordalina\\MixpanelBundle\\": "" }
