@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\MixPanel\EventListener;
 
-use Gordalina\MixpanelBundle\MixPanel\ManagerRegistry;
+use Gordalina\MixpanelBundle\Annotation\UpdateUser;
+use Gordalina\MixpanelBundle\MixPanel\Event\MixPanelEvent;
 use Gordalina\MixpanelBundle\MixPanel\Security\Authentication;
-use Gordalina\MixpanelBundle\MixPanel\Security\UserData;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -37,14 +38,9 @@ class AuthenticationListener
     private $authentication;
 
     /**
-     * @var ManagerRegistry
+     * @var EventDispatcherInterface
      */
-    private $registry;
-
-    /**
-     * @var UserData
-     */
-    private $userData;
+    private $eventDispatcher;
 
     /**
      * @var bool
@@ -56,12 +52,11 @@ class AuthenticationListener
      */
     private $sendDataToMixpanel;
 
-    public function __construct(TokenStorageInterface $tokenStorage, Authentication $authentication, ManagerRegistry $registry, UserData $userData, bool $autoUpdateUser, bool $sendDataToMixpanel)
+    public function __construct(TokenStorageInterface $tokenStorage, Authentication $authentication, EventDispatcherInterface $eventDispatcher , bool $autoUpdateUser, bool $sendDataToMixpanel)
     {
         $this->tokenStorage       = $tokenStorage;
         $this->authentication     = $authentication;
-        $this->registry           = $registry;
-        $this->userData           = $userData;
+        $this->eventDispatcher    = $eventDispatcher;
         $this->autoUpdateUser     = $autoUpdateUser;
         $this->sendDataToMixpanel = $sendDataToMixpanel;
     }
@@ -92,13 +87,7 @@ class AuthenticationListener
                 return;
             }
 
-            $userId     = $this->userData->getId();
-            $properties = $this->userData->getProperties();
-            unset($properties['id']);
-            /** @var \Mixpanel $project */
-            foreach ($this->registry->getProjects() as $project) {
-                $project->people->set($userId, $properties, $e->getRequest()->getClientIp());
-            }
+            $this->eventDispatcher->dispatch(new MixPanelEvent(new UpdateUser(), $e->getRequest()));
         }
     }
 
