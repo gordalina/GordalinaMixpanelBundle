@@ -9,11 +9,11 @@ services:
             $autoUpdateUser: '%gordalina_mixpanel.auto_update_user%'
             $enableProfiler: '%gordalina_mixpanel.enable_profiler%'
 
-    Gordalina\MixpanelBundle\MixPanel\:
-        resource: '../../MixPanel/*'
-        exclude: '../../MixPanel/{Event}'
+    Gordalina\MixpanelBundle\Mixpanel\:
+        resource: '../../Mixpanel/*'
+        exclude: '../../Mixpanel/{Event}'
 
-    Gordalina\MixpanelBundle\MixPanel\EventListener\AuthenticationListener:
+    Gordalina\MixpanelBundle\Mixpanel\EventListener\AuthenticationListener:
         tags:
             - { name: kernel.event_listener, event: security.authentication.success, method: onAuthenticationSuccess, priority: -256 }
             - { name: kernel.event_listener, event: security.interactive_login, method: onInteractiveLogin, priority: -256 }
@@ -21,14 +21,14 @@ services:
             - { name: kernel.event_listener, event: security.switch_user, method: onSwitchUser, priority: -256 }
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: -256 }
 
-    Gordalina\MixpanelBundle\MixPanel\EventListener\ControllerListener:
+    Gordalina\MixpanelBundle\Mixpanel\EventListener\ControllerListener:
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -256 }
 
-    Gordalina\MixpanelBundle\MixPanel\EventListener\FinishRequestListener:
+    Gordalina\MixpanelBundle\Mixpanel\EventListener\FinishRequestListener:
         tags:
             - { name: kernel.event_listener, event: kernel.finish_request, method: onFinishRequest, priority: -99 }
 
-    Gordalina\MixpanelBundle\MixPanel\DataCollector\MixpanelDataCollector:
+    Gordalina\MixpanelBundle\Mixpanel\DataCollector\MixpanelDataCollector:
         tags:
             - { name: data_collector, template: "GordalinaMixpanelBundle:DataCollector:mixpanel", id: "mixpanel" }

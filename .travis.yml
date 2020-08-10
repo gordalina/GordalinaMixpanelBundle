@@ -58,5 +58,5 @@ install:
     - composer update ${COMPOSER_FLAGS} --prefer-dist --no-interaction
 
 script:
-    - bin/php-cs-fixer fix --verbose --diff --dry-run MixPanel/
+    - bin/php-cs-fixer fix --verbose --diff --dry-run Mixpanel/
     - bin/phpspec run -f dot -n

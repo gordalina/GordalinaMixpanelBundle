@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\DependencyInjection;
 
-use Gordalina\MixpanelBundle\MixPanel\ManagerRegistry;
+use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;

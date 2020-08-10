@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Gordalina\MixpanelBundle\MixPanel\Event;
+namespace Gordalina\MixpanelBundle\Mixpanel\Event;
 
 use Gordalina\MixpanelBundle\Annotation\Annotation;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MixPanelEvent extends Event
+class MixpanelEvent extends Event
 {
     private $annotation;
     private $request;

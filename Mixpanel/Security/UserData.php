@@ -11,9 +11,9 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\MixPanel\Security;
+namespace Gordalina\MixpanelBundle\Mixpanel\Security;
 
-use Gordalina\MixpanelBundle\MixPanel\ManagerRegistry;
+use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 

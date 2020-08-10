@@ -73,7 +73,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('email')->end()
                             ->scalarNode('phone')->end()
                             ->arrayNode('extra_data')
-                                ->info('Non-default properties in MixPanel user profile')
+                                ->info('Non-default properties in Mixpanel user profile')
                                 ->prototype('array')
                                     ->children()
                                         ->scalarNode('key')->isRequired()->end()

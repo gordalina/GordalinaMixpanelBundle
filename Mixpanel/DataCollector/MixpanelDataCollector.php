@@ -11,10 +11,10 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\MixPanel\DataCollector;
+namespace Gordalina\MixpanelBundle\Mixpanel\DataCollector;
 
-use Gordalina\MixpanelBundle\MixPanel\ManagerRegistry;
-use Gordalina\MixpanelBundle\MixPanel\Mixpanel\Flusher;
+use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
+use Gordalina\MixpanelBundle\Mixpanel\Mixpanel\Flusher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;

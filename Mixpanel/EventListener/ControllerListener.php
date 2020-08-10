@@ -11,13 +11,13 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\MixPanel\EventListener;
+namespace Gordalina\MixpanelBundle\Mixpanel\EventListener;
 
 use Doctrine\Common\Annotations\Reader;
 use Doctrine\Common\Util\ClassUtils;
 use Gordalina\MixpanelBundle\Annotation;
-use Gordalina\MixpanelBundle\MixPanel\Event\MixPanelEvent;
-use Gordalina\MixpanelBundle\MixPanel\Security\UserData;
+use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
+use Gordalina\MixpanelBundle\Mixpanel\Security\UserData;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
@@ -70,7 +70,7 @@ class ControllerListener
             foreach ($collection as $annotation) {
                 if ($annotation instanceof Annotation\Annotation) {
                     $this->prepareAnnotation($annotation, $event->getRequest());
-                    $this->eventDispatcher->dispatch(new MixPanelEvent($annotation, $event->getRequest()));
+                    $this->eventDispatcher->dispatch(new MixpanelEvent($annotation, $event->getRequest()));
                 }
             }
         }

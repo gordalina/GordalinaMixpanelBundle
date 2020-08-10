@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Gordalina\MixpanelBundle\MixPanel\EventListener;
+namespace Gordalina\MixpanelBundle\Mixpanel\EventListener;
 
 use Gordalina\MixpanelBundle\Annotation;
-use Gordalina\MixpanelBundle\MixPanel\Event\MixPanelEvent;
-use Gordalina\MixpanelBundle\MixPanel\ManagerRegistry;
-use Gordalina\MixpanelBundle\MixPanel\Security\UserData;
+use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
+use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
+use Gordalina\MixpanelBundle\Mixpanel\Security\UserData;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class MixPanelListener implements EventSubscriberInterface
+class MixpanelListener implements EventSubscriberInterface
 {
     /**
      * @var ManagerRegistry
@@ -37,11 +37,11 @@ class MixPanelListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            MixPanelEvent::class => 'sendEvent',
+            MixpanelEvent::class => 'sendEvent',
         ];
     }
 
-    public function sendEvent(MixPanelEvent $event)
+    public function sendEvent(MixpanelEvent $event)
     {
         if (!$this->sendDataToMixpanel) {
             return;

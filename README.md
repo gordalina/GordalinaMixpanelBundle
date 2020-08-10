@@ -135,7 +135,7 @@ This bundle uses property access to get the values out of the user object, so
 event if you dont have a `first_name` property, but have a `getFirstName` method
 it will work.
 
-**NOTE:** ``extra_data`` corresponding non-default properties in MixPanel user profile
+**NOTE:** ``extra_data`` corresponding non-default properties in Mixpanel user profile
 
 ```php
 <?php
@@ -214,7 +214,7 @@ e.g: `@Mixpanel\Expression("<expression>")` or `@Mixpanel\Set("<property>", valu
 **Note**: All `id` properties can be omitted, as they will be set with the id of
 the current user in `security.context`
 
-### MixPanelEvent
+### MixpanelEvent
 
 You can also send an event through symfony events when the annotations are not sufficient like this:
 ```php
@@ -222,7 +222,7 @@ You can also send an event through symfony events when the annotations are not s
 namespace myNamespace;
 
 use Gordalina\MixpanelBundle\Annotation as Annotation;
-use Gordalina\MixpanelBundle\MixPanel\Event\MixPanelEvent;
+use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 // ...
@@ -237,7 +237,7 @@ public function edit(User $user, EventDispatcherInterface $eventDispatcher, Requ
         'prop 2' => 'data 2',
     ];
     
-    $eventDispatcher->dispatch(new MixPanelEvent($annotation, $request));
+    $eventDispatcher->dispatch(new MixpanelEvent($annotation, $request));
     // Rest of your code
 }
 ```
@@ -265,7 +265,7 @@ use Doctrine\Common\Annotations\Reader;
 use Gordalina\MixpanelBundle\Annotation;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-class MixPanelListener
+class MixpanelListener
 {
     private $annotationReader;
 
@@ -300,7 +300,7 @@ class MixPanelListener
 
 And in your config:
 ```yaml
-    YourNamespace\MixPanelListener:
+    YourNamespace\MixpanelListener:
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -200 }
 ```

@@ -11,11 +11,11 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\MixPanel\EventListener;
+namespace Gordalina\MixpanelBundle\Mixpanel\EventListener;
 
 use Gordalina\MixpanelBundle\Annotation\UpdateUser;
-use Gordalina\MixpanelBundle\MixPanel\Event\MixPanelEvent;
-use Gordalina\MixpanelBundle\MixPanel\Security\Authentication;
+use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
+use Gordalina\MixpanelBundle\Mixpanel\Security\Authentication;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -52,7 +52,7 @@ class AuthenticationListener
      */
     private $sendDataToMixpanel;
 
-    public function __construct(TokenStorageInterface $tokenStorage, Authentication $authentication, EventDispatcherInterface $eventDispatcher , bool $autoUpdateUser, bool $sendDataToMixpanel)
+    public function __construct(TokenStorageInterface $tokenStorage, Authentication $authentication, EventDispatcherInterface $eventDispatcher, bool $autoUpdateUser, bool $sendDataToMixpanel)
     {
         $this->tokenStorage       = $tokenStorage;
         $this->authentication     = $authentication;
@@ -87,7 +87,7 @@ class AuthenticationListener
                 return;
             }
 
-            $this->eventDispatcher->dispatch(new MixPanelEvent(new UpdateUser(), $e->getRequest()));
+            $this->eventDispatcher->dispatch(new MixpanelEvent(new UpdateUser(), $e->getRequest()));
         }
     }
 
