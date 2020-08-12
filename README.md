@@ -109,7 +109,7 @@ this will be set automatically. This is done automatically provided you have con
 You are able to override this value if you wish.
 
 ```yaml
-# config/packages/gordolina_mixpanel.yaml
+# config/packages/gordalina_mixpanel.yaml
 
 gordalina_mixpanel:
     projects:
@@ -170,10 +170,10 @@ class OrderController
 {
     /**
      * @Mixpanel\Track("Order Completed", props={
-     *      "user": @Mixpanel\Expression("user.getId()")
+     *      "user_id": @Mixpanel\Expression("user.getId()")
      * })
      * @Mixpanel\TrackCharge(
-     *      id=@Mixpanel\Expression("user.getId()"),
+     *      id=324"),
      *      amount=@Mixpanel\Expression("order.getAmount()")
      * )
      */
@@ -248,7 +248,7 @@ In all your annotations, you can have something like this:
 ```php
     /**
      * @Mixpanel\Track("Your event", props={
-     *      "element": "something"
+     *      "user_id": @Mixpanel\Expression("user.getId()")
      * })
      */
     public function yourAction()
@@ -264,14 +264,17 @@ namespace YourNamespace;
 use Doctrine\Common\Annotations\Reader;
 use Gordalina\MixpanelBundle\Annotation;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Security\Core\Security;
 
 class MixpanelListener
 {
     private $annotationReader;
+    private $security;
 
-    public function __construct(Reader $annotationReader)
+    public function __construct(Reader $annotationReader, Security $security)
     {
         $this->annotationReader = $annotationReader;
+        $this->security         = $security; 
     }
 
     public function onKernelController(ControllerEvent $event)
@@ -290,7 +293,7 @@ class MixpanelListener
         foreach ([$classAnnotations, $methodAnnotations] as $collection) {
             foreach ($collection as $annotation) {
                 if ($annotation instanceof Annotation\Annotation && property_exists($annotation, 'props')) {
-                    $annotation->props['element'] = 'something';
+                    $annotation->props['user_id'] = $this->security->getUser()->getId();
                 }
             }
         }
