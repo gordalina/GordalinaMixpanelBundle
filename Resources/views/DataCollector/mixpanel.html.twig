@@ -1,9 +1,11 @@
-{% extends 'WebProfilerBundle:Profiler:layout.html.twig' %}
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% import _self as helper %}
 
 {% block toolbar %}
     {% set icon %}
         <img width="22" height="19" alt="Mixpanel" style="margin:5px 0 3px 0" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACwAAAAmBAMAAABNMWRUAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAwUExURQAAAD8/Pz4+Pj8/Pz4+Pj4+Pjs7Oz4+Pj4+Pj8/Pz4+Pj4+Pj4+Pj4+Pj4+Pj8/P4rM7nQAAAAPdFJOUwARlkyGxAetJvY4detf2rpWZgcAAAF3SURBVCjPzZKxL0NRFMZPPanmteRFTBLRwWDSZ7DXJBFJlVgsfU0MpAahg0m7moRGYqtJsDDVYKi/QCsdjMU/0Gg0TXl8vvte08qrVeIM933nd8+599xznsi/Mb8l6+f8Bi4trkmR0TOFL3JreSxLqoYjQ3wlcwatXeJYPQPgIcHlWTSk+W2ZxLY9kcExlqbQJK41Kws4IUZc9BI+xR+BoalIX6JB3DJEigiLbMLU8MZz95GVWJPigEIGcK3hVZQo8EqKcTClD1ENT/T6MenFi/SCvfhOlJj14nd6QzC9+IstKLI4D8aqjOBDvHgF93lsiVS5JSHbKaCsIc4O1XlQqkCiz6sW31osUJ9LZ73Nd+uWP8G6qq0dsffSvfqmI1lozlVj0928IGdqG0oN5m2zg0PEiCp1BRw6f07FmRfNuT8GDtppt+nEtHEEqnVqlGWRDYXDyq3CGYIEti2VQjt1o9xtx3y1dq74H3d+vGy41DB/e3HS6GXfnWbOe+bMkrUAAAAASUVORK5CYII="/>
-        <span class="sf-toolbar-status">{{ collector.total }}</span>
+        <span class="sf-toolbar-value">{{ collector.total }}</span>
     {% endset %}
     {% set text %}
         <div class="sf-toolbar-info-piece">
@@ -19,7 +21,7 @@
             <span>{{ '%0.2f'|format(collector.time) }} ms</span>
         </div>
     {% endset %}
-    {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { 'link': profiler_url } %}
+    {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { 'link': true } %}
 {% endblock %}
 
 {% block menu %}
@@ -30,7 +32,7 @@
     <strong>Mixpanel</strong>
     <span class="count">
         <span>{{ collector.total }}</span>
-        <span>{{ '%0.0f'|format(collector.time) }} MS</span>
+        <span>{{ '%0.0f'|format(collector.time) }} ms</span>
     </span>
 </span>
 {% endblock %}
@@ -42,7 +44,8 @@
         <h3>Events</h3>
 
         {% if collector.getEvents(id)|length > 0 %}
-            {% include 'WebProfilerBundle:Profiler:table.html.twig' with {data: collector.getEvents(id)} only %}
+            {% set events = collector.getEvents(id) %}
+            {{ helper.render_simple_table(events) }}
         {% else %}
             <p>
                 <em>No events.</em>
@@ -52,7 +55,8 @@
         <h3>Engagement</h3>
 
         {% if collector.getEngagement(id)|length > 0 %}
-            {% include 'WebProfilerBundle:Profiler:table.html.twig' with {data: collector.getEngagement(id)} only %}
+            {% set engagement = collector.getEngagement(id) %}
+            {{ helper.render_simple_table(engagement) }}
         {% else %}
             <p>
                 <em>No engagement.</em>
@@ -63,7 +67,7 @@
     <h2>Projects</h2>
 
     {% if collector.projects|length > 0 %}
-        {% include 'WebProfilerBundle:Profiler:table.html.twig' with {data: collector.projects} only %}
+        {{ helper.render_simple_table(collector.projects) }}
     {% else %}
         <p>
             <em>No projects.</em>
@@ -73,10 +77,29 @@
     <h2>Configuration</h2>
     {% for id in collector.config|keys %}
         <h3><pre>{{ id }}</pre></h3>
-
-        {% include 'WebProfilerBundle:Profiler:table.html.twig' with {data: collector.config[id]} only %}
+        {% set configs = collector.config[id] %}
+        {{ helper.render_simple_table(configs) }}
     {% endfor %}
 
     <h3>Users</h3>
-    {% include 'WebProfilerBundle:Profiler:table.html.twig' with {data: collector.users} only %}
+    {{ helper.render_simple_table(collector.users) }}
 {% endblock %}
+
+{% macro render_simple_table(data, label1, label2) %}
+    <table>
+        <thead>
+        <tr>
+            <th scope="col" class="key">{{ label1 is defined ? label1 : 'Key' }}</th>
+            <th scope="col">{{ label2 is defined ? label2 : 'Value' }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for key, value in data %}
+            <tr>
+                <th scope="row">{{ key }}</th>
+                <td>{{ value is iterable ? dump(value) : value }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

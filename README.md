@@ -2,11 +2,8 @@ GordalinaMixpanelBundle
 =====================
 
 Integration of the [**Mixpanel**](https://github.com/mixpanel/mixpanel-php) library
-into Symfony2.
+into Symfony.
 
-**Important:** this bundle is developed in sync with [Mixpanel's
-repository](https://github.com/mixpanel/mixpanel-php). If you are using Mixpanel
-`2.6`, you need to use the `~2.6` releases of the bundle (or higher if available).
 
 * [Installation](#installation)
 * [Usage](#usage)
@@ -24,7 +21,7 @@ Installation
 Require [`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle) using composer
 
 ```sh
-$ php composer.phar require gordalina/mixpanel-bundle:~2.6
+$ php composer.phar require gordalina/mixpanel-bundle:~3.0
 ```
 
 Or require
@@ -35,25 +32,19 @@ to your `composer.json` file:
 ```json
 {
     "require": {
-        "gordalina/mixpanel-bundle": "@stable"
+        "gordalina/mixpanel-bundle": "~3.0"
     }
 }
 ```
 
-**Protip:** you should browse the
-[`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle)
-page to choose a stable version to use, avoid the `@stable` meta constraint.
-
-Register the bundle in `app/AppKernel.php`:
+Register the bundle in `config/bundles.php`:
 
 ```php
-// app/AppKernel.php
-public function registerBundles()
-{
-    return array(
+// config/bundles.php
+    return [
         // ...
-        new Gordalina\MixpanelBundle\GordalinaMixpanelBundle(),
-    );
+        Gordalina\MixpanelBundle\GordalinaMixpanelBundle::class => ['all' => true],
+    ];
 }
 ```
 
@@ -65,7 +56,7 @@ Enable the bundle's configuration in `app/config/config.yml`:
 gordalina_mixpanel:
     projects:
         default:
-            token: 794f0d43f9dbc91e3eb605a5a7bd37ce
+            token: xxxxxxxxxxxxxxxxxxxx
 ```
 
 Usage
@@ -76,15 +67,18 @@ service which is an instance of `Mixpanel` (from the official library).
 You'll be able to do whatever you want with it.
 
 **NOTE:** This bundle sends your client's ip address automatically. If you have
-a reverse proxy in you servers you should set it in your `config.yml`:
+a reverse proxy in you servers you should set it in your front controller `public/index.php`:
 
-``` yaml
-# app/config/config.yml
-
-framework:
-    trusted_proxies: ['127.0.0.1']
-    # ...
+```php
+// public/index.php
+Request::setTrustedProxies(
+    // the IP address (or range) of your proxy
+    ['192.0.0.1', '10.0.0.0/8'],
+    Request::HEADER_X_FORWARDED_ALL
+);
 ```
+
+You can find more documentation on Symfony website: [How to Configure Symfony to Work behind a Load Balancer or a Reverse Proxy](https://symfony.com/doc/current/deployment/proxies.html#solution-settrustedproxies)
 
 ### Killer Feature
 
@@ -101,7 +95,7 @@ class CheckoutController
     /**
      * @Mixpanel\Track("View Checkout")
      */
-    public function viewAction(Request $request)
+    public function view(Request $request)
     {
         // ...
     }
@@ -110,17 +104,17 @@ class CheckoutController
 ### Sending people information to Mixpanel
 
 Mixpanel allows you to track your user's behaviours, but also some user information.
-When using annotations which require the [distinct_id](https://mixpanel.com/help/questions/articles/what-is-distinctid),
+When using annotations which require the [distinct_id](https://help.mixpanel.com/hc/en-us/articles/115004509406-What-is-distinct-id-),
 this will be set automatically. This is done automatically provided you have configured it properly.
 You are able to override this value if you wish.
 
 ```yaml
-# app/config/config.yml
+# config/packages/gordalina_mixpanel.yaml
 
 gordalina_mixpanel:
     projects:
         default:
-            token: 794f0d43f9dbc91e3eb605a5a7bd37ce
+            token: xxxxxxxxxx
     users:
         Symfony\Component\Security\Core\User\UserInterface:
             id: username
@@ -133,12 +127,15 @@ gordalina_mixpanel:
             last_name: last_name
             email: email
             phone: phone
+            extra_data:
+                - { key: whatever, value: test }
 ```
 
 This bundle uses property access to get the values out of the user object, so
 event if you dont have a `first_name` property, but have a `getFirstName` method
 it will work.
 
+**NOTE:** ``extra_data`` corresponding non-default properties in Mixpanel user profile
 
 ```php
 <?php
@@ -151,7 +148,7 @@ class UserController
     /**
      * @Mixpanel\UpdateUser()
      */
-    public function userUpdatedAction(User $user, Request $request)
+    public function userUpdated(User $user, Request $request)
     {
         // ...
     }
@@ -172,10 +169,15 @@ use Gordalina\MixpanelBundle\Annotation as Mixpanel;
 class OrderController
 {
     /**
-     * @Mixpanel\Track("Order Completed")
-     * @Mixpanel\TrackCharge(id=@Mixpanel\Expression("user.getId()"), amount=@Mixpanel\Expression("order.getAmount()"))
+     * @Mixpanel\Track("Order Completed", props={
+     *      "user_id": @Mixpanel\Expression("user.getId()")
+     * })
+     * @Mixpanel\TrackCharge(
+     *      id=324"),
+     *      amount=@Mixpanel\Expression("order.getAmount()")
+     * )
      */
-    public function orderCompletedAction(Order $order, Request $request)
+    public function orderCompleted(Order $order, Request $request)
     {
         // ...
     }
@@ -212,8 +214,102 @@ e.g: `@Mixpanel\Expression("<expression>")` or `@Mixpanel\Set("<property>", valu
 **Note**: All `id` properties can be omitted, as they will be set with the id of
 the current user in `security.context`
 
+### MixpanelEvent
 
-### Symfony2 Profiler Integration
+You can also send an event through symfony events when the annotations are not sufficient like this:
+```php
+#In controller
+namespace myNamespace;
+
+use Gordalina\MixpanelBundle\Annotation as Annotation;
+use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+// ...
+
+public function edit(User $user, EventDispatcherInterface $eventDispatcher, Request $request)
+{
+    // Your code
+    $annotation = new Annotation\Track();
+    $annotation->event = 'My event';
+    $annotation->props = [
+        'prop 1' => 'data 1',
+        'prop 2' => 'data 2',
+    ];
+    
+    $eventDispatcher->dispatch(new MixpanelEvent($annotation, $request));
+    // Rest of your code
+}
+```
+
+### Override Props in all Annotations
+
+In all your annotations, you can have something like this:
+```php
+    /**
+     * @Mixpanel\Track("Your event", props={
+     *      "user_id": @Mixpanel\Expression("user.getId()")
+     * })
+     */
+    public function yourAction()
+    {
+        // ...
+    }
+```
+It can be annoying to always have to put the same properties in your annotations. The functioning of the events allows us to avoid that.
+
+```php
+namespace YourNamespace;
+
+use Doctrine\Common\Annotations\Reader;
+use Gordalina\MixpanelBundle\Annotation;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Security\Core\Security;
+
+class MixpanelListener
+{
+    private $annotationReader;
+    private $security;
+
+    public function __construct(Reader $annotationReader, Security $security)
+    {
+        $this->annotationReader = $annotationReader;
+        $this->security         = $security; 
+    }
+
+    public function onKernelController(ControllerEvent $event)
+    {
+        if (!\is_array($controller = $event->getController())) {
+            return;
+        }
+
+        $className = \get_class($controller[0]);
+        $object    = new \ReflectionClass($className);
+        $method    = $object->getMethod($controller[1]);
+
+        $classAnnotations  = $this->annotationReader->getClassAnnotations($object);
+        $methodAnnotations = $this->annotationReader->getMethodAnnotations($method);
+
+        foreach ([$classAnnotations, $methodAnnotations] as $collection) {
+            foreach ($collection as $annotation) {
+                if ($annotation instanceof Annotation\Annotation && property_exists($annotation, 'props')) {
+                    $annotation->props['user_id'] = $this->security->getUser()->getId();
+                }
+            }
+        }
+    }
+}
+```
+
+And in your config:
+```yaml
+    YourNamespace\MixpanelListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -200 }
+```
+
+
+### Symfony Profiler Integration
 
 Mixpanel bundle additionally integrates with Symfony2 profiler. You can
 check number of events and engagements sent, total execution time and other information.
@@ -231,10 +327,12 @@ You'll find the reference configuration below:
 # app/config/config*.yml
 
 gordalina_mixpanel:
+    enabled: true                                 # defaults to true
     enable_profiler: %kernel.debug%               # defaults to %kernel.debug%
+    auto_update_user: %kernel.debug%              # defaults to %kernel.debug%
     projects:
         default:
-            token: 794f0d43f9dbc91e3eb605a5a7bd37ce # required
+            token: xxxxxxxxxxxxxxxxxxxxxxxxxxxx # required
             options:
                 max_batch_size:  50               # the max batch size Mixpanel will accept is 50,
                 max_queue_size:  1000             # the max num of items to hold in memory before flushing
@@ -249,7 +347,7 @@ gordalina_mixpanel:
                 error_callback:  'Doctrine\Common\Util\Debug::dump'
 
         minimum_configuration:
-            token: 794f0d43f9dbc91e3eb605a5a7bd37ce
+            token: xxxxxxxxxxxxxxxxxxxxxxxxxxxx
     users:
         Symfony\Component\Security\Core\User\UserInterface:
             id: username

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -22,12 +24,12 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * @var boolean
+     * @var bool
      */
     private $debug;
 
     /**
-     * @param boolean $debug
+     * @param bool $debug
      */
     public function __construct($debug)
     {
@@ -39,11 +41,19 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('gordalina_mixpanel');
+        $treeBuilder = new TreeBuilder('gordalina_mixpanel');
+        $rootNode    = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
+                ->booleanNode('enabled')
+                    ->info('Send Data to Mixpanel')
+                    ->defaultValue(true)
+                ->end()
+                ->booleanNode('auto_update_user')
+                    ->info('Send data user on each master request (useful if you do not force users to disconnect when setting up the bundle or add new properties in their profile. WARNING: preferred used @Mixpanel\UpdateUser() or @Mixpanel\Set() at connection for performances)')
+                    ->defaultValue($this->debug)
+                ->end()
                 ->booleanNode('enable_profiler')
                     ->defaultValue($this->debug)
                 ->end()
@@ -53,7 +63,7 @@ class Configuration implements ConfigurationInterface
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return is_string($v) && strlen($v) > 0; })
                             ->then(function ($v) {
-                                return array('id' => $v);
+                                return ['id' => $v];
                             })
                         ->end()
                         ->children()
@@ -62,6 +72,15 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('last_name')->end()
                             ->scalarNode('email')->end()
                             ->scalarNode('phone')->end()
+                            ->arrayNode('extra_data')
+                                ->info('Non-default properties in Mixpanel user profile')
+                                ->prototype('array')
+                                    ->children()
+                                        ->scalarNode('key')->isRequired()->end()
+                                        ->scalarNode('value')->isRequired()->end()
+                                    ->end()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
@@ -83,7 +102,7 @@ class Configuration implements ConfigurationInterface
     public function addMixpanelOptionsNode()
     {
         $builder = new TreeBuilder();
-        $node = $builder->root('options');
+        $node    = $builder->root('options');
 
         $node
             ->addDefaultsIfNotSet()
@@ -104,7 +123,7 @@ class Configuration implements ConfigurationInterface
                         ->beforeNormalization()
                             ->ifTrue(function ($v) { return is_string($v) && strlen($v) > 0; })
                             ->then(function ($v) {
-                                return array('class' => $v);
+                                return ['class' => $v];
                             })
                         ->end()
                         ->children()

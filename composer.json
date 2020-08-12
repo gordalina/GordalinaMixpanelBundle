@@ -11,23 +11,25 @@
         }
     ],
     "require": {
-        "symfony/framework-bundle": "^2.6|^3.0",
-        "symfony/security-http": "^2.6|^3.0",
-        "mixpanel/mixpanel-php": "~2.6"
+        "php": "^7.2",
+        "symfony/framework-bundle": "^4.4 || ^5.0",
+        "symfony/expression-language": "^4.4 || ^5.0",
+        "symfony/security-http": "^4.4 || ^5.0",
+        "mixpanel/mixpanel-php": "~2.8"
     },
     "require-dev": {
-        "phpspec/phpspec": "^3.0"
+        "phpspec/phpspec": "^6.2",
+        "friendsofphp/php-cs-fixer": "^2.16.4"
     },
     "autoload": {
-      "psr-0": { "Gordalina\\MixpanelBundle": "" }
+      "psr-4": { "Gordalina\\MixpanelBundle\\": "" }
     },
-    "target-dir": "Gordalina/MixpanelBundle",
     "config": {
         "bin-dir": "bin"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7-dev"
+            "dev-master": "3.0-dev"
         }
     }
 }

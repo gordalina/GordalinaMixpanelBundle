@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -9,9 +11,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Mixpanel;
+namespace Gordalina\MixpanelBundle\Mixpanel\Mixpanel;
 
-use Gordalina\MixpanelBundle\ManagerRegistry;
+use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
+use Mixpanel;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 class Flusher
@@ -29,33 +32,25 @@ class Flusher
     /**
      * @var array
      */
-    private $data = array();
+    private $data = [];
 
     /**
-     * @var integer
+     * @var int
      */
     private $time;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $enableProfiler;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param Stopwatch       $stopwatch      defaults to null
-     * @param boolean         $enableProfiler defaults to false
-     */
-    public function __construct(ManagerRegistry $registry, Stopwatch $stopwatch = null, $enableProfiler = false)
+    public function __construct(ManagerRegistry $registry, Stopwatch $stopwatch = null, bool $enableProfiler = false)
     {
-        $this->registry = $registry;
-        $this->stopwatch = $stopwatch ?: new Stopwatch();
+        $this->registry       = $registry;
+        $this->stopwatch      = $stopwatch ?: new Stopwatch();
         $this->enableProfiler = $enableProfiler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function flush()
     {
         if (!$this->enableProfiler) {
@@ -74,7 +69,7 @@ class Flusher
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getTime()
     {
@@ -83,7 +78,6 @@ class Flusher
 
     /**
      * @see http://en.wikipedia.org/wiki/Glossary_of_poker_terms#poker_face
-     * @return null
      */
     private function straightFlush()
     {
@@ -93,18 +87,15 @@ class Flusher
         }
     }
 
-    /**
-     * @return null
-     */
     private function dataCollectorFlush()
     {
         // get data from the queue
         foreach ($this->registry->getProjects() as $id => $project) {
             if (!isset($this->data[$id])) {
-                $this->data[$id] = array(
-                    'events' => array(),
-                    'people' => array(),
-                );
+                $this->data[$id] = [
+                    'events' => [],
+                    'people' => [],
+                ];
             }
 
             $this->data[$id]['events'] = array_merge($this->data[$id]['events'], $this->getQueue($project, '_events', false));
@@ -112,7 +103,7 @@ class Flusher
         }
 
         // log the time spent flushing
-        $key = sprintf("%s::flush", get_class($this->registry));
+        $key = sprintf('%s::flush', get_class($this->registry));
         $this->stopwatch->start($key);
 
         $this->straightFlush();
@@ -123,17 +114,12 @@ class Flusher
 
     /**
      * This is quite a hack, but gets the job done.
-     *
-     * @param  MixPanel $project
-     * @param  string   $propertyName
-     * @param  boolean  $isAccessible
-     * @return array
      */
-    private function getQueue(\MixPanel $project, $propertyName, $isAccessible)
+    private function getQueue(Mixpanel $project, string $propertyName, bool $isAccessible): array
     {
-        $queue = array();
+        $queue = [];
 
-        $rfl = new \ReflectionClass($project);
+        $rfl      = new \ReflectionClass($project);
         $property = $rfl->getProperty($propertyName);
 
         if (!$isAccessible) {

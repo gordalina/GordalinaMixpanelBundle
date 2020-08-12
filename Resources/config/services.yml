@@ -1,23 +1,34 @@
-imports:
-    - { resource: parameters.yml }
-    - { resource: services/event_listeners.yml }
-    - { resource: services/security.yml }
-    - { resource: services/data_collector.yml }
-
 services:
-    gordalina_mixpanel.registry:
-        class: "%gordalina_mixpanel.registry.class%"
-
-    gordalina_mixpanel.flusher:
-        class: "%gordalina_mixpanel.flusher.class%"
-        arguments:
-            - "@gordalina_mixpanel.registry"
-            - "@?debug.stopwatch"
-            - "%gordalina_mixpanel.enable_profiler%"
-        lazy: true
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true
+        autoconfigure: true
         public: false
+        bind:
+            $sendDataToMixpanel: '%gordalina_mixpanel.enabled%'
+            $autoUpdateUser: '%gordalina_mixpanel.auto_update_user%'
+            $enableProfiler: '%gordalina_mixpanel.enable_profiler%'
 
-    gordalina_mixpanel.expression_language:
-        class: "%gordalina_mixpanel.expression_language.class%"
-        lazy: true
-        public: false
+    Gordalina\MixpanelBundle\Mixpanel\:
+        resource: '../../Mixpanel/*'
+        exclude: '../../Mixpanel/{Event}'
+
+    Gordalina\MixpanelBundle\Mixpanel\EventListener\AuthenticationListener:
+        tags:
+            - { name: kernel.event_listener, event: security.authentication.success, method: onAuthenticationSuccess, priority: -256 }
+            - { name: kernel.event_listener, event: security.interactive_login, method: onInteractiveLogin, priority: -256 }
+            - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure, priority: -256 }
+            - { name: kernel.event_listener, event: security.switch_user, method: onSwitchUser, priority: -256 }
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: -256 }
+
+    Gordalina\MixpanelBundle\Mixpanel\EventListener\ControllerListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -256 }
+
+    Gordalina\MixpanelBundle\Mixpanel\EventListener\FinishRequestListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.finish_request, method: onFinishRequest, priority: -99 }
+
+    Gordalina\MixpanelBundle\Mixpanel\DataCollector\MixpanelDataCollector:
+        tags:
+            - { name: data_collector, template: "GordalinaMixpanelBundle:DataCollector:mixpanel", id: "mixpanel" }

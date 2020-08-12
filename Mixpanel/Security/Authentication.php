@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -9,9 +11,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Security;
+namespace Gordalina\MixpanelBundle\Mixpanel\Security;
 
-use Gordalina\MixpanelBundle\ManagerRegistry;
+use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
+use Gordalina\MixpanelBundle\Mixpanel\Mixpanel\Flusher;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class Authentication
@@ -19,7 +22,7 @@ class Authentication
     /**
      * @var ManagerRegistry
      */
-    private $managerRegistry;
+    private $registry;
 
     /**
      * @var UserData
@@ -27,19 +30,17 @@ class Authentication
     private $userData;
 
     /**
-     * @param ManagerRegistry $managerRegistry
-     * @param UserData        $userData
+     * @var Flusher
      */
-    public function __construct(ManagerRegistry $registry, UserData $userData)
+    private $flusher;
+
+    public function __construct(ManagerRegistry $registry, UserData $userData, Flusher $flusher)
     {
         $this->registry = $registry;
         $this->userData = $userData;
+        $this->flusher  = $flusher;
     }
 
-    /**
-     * @param  TokenInterface $token
-     * @return boolean
-     */
     public function onAuthenticationSuccess(TokenInterface $token)
     {
         if (null === ($user = $token->getUser())) {
@@ -55,12 +56,9 @@ class Authentication
         return true;
     }
 
-    /**
-     * @return null
-     */
     public function onAuthenticationFailure()
     {
-        $this->registry->flush();
+        $this->flusher->flush();
 
         foreach ($this->registry->getProjects() as $project) {
             // clear identity

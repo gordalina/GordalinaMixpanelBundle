@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -11,12 +13,12 @@
 
 namespace Gordalina\MixpanelBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * This is the class that loads and manages your bundle configuration
@@ -31,38 +33,15 @@ class GordalinaMixpanelExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration($container->getParameter('kernel.debug'));
-        $config = $this->processConfiguration($configuration, $configs);
+        $config        = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        $this->registerClassesToCompile();
         $this->loadRegistry($config, $container);
         $this->loadParameters($config, $container);
     }
 
-    /**
-     * @return null
-     */
-    private function registerClassesToCompile()
-    {
-        $this->addClassesToCompile(array(
-            'Gordalina\MixpanelBundle\Annotation\Annotation',
-            'Gordalina\MixpanelBundle\EventListener\AuthenticationListener',
-            'Gordalina\MixpanelBundle\EventListener\ControllerListener',
-            'Gordalina\MixpanelBundle\EventListener\FinishRequestListener',
-            'Gordalina\MixpanelBundle\Mixpanel\Flusher',
-            'Gordalina\MixpanelBundle\ManagerRegistry',
-            'Gordalina\MixpanelBundle\Security\Authentication',
-            'Gordalina\MixpanelBundle\Security\UserData',
-        ));
-    }
-
-    /**
-     * @param  array            $config
-     * @param  ContainerBuilder $container
-     * @return null
-     */
     private function loadRegistry(array $config, ContainerBuilder $container)
     {
         if (array_key_exists('default', $config['projects'])) {
@@ -71,7 +50,7 @@ class GordalinaMixpanelExtension extends Extension
             $default = key($config['projects']);
         }
 
-        $registry = $container->getDefinition('gordalina_mixpanel.registry');
+        $registry = $container->getDefinition(ManagerRegistry::class);
 
         foreach ($config['projects'] as $name => $project) {
             $id = "gordalina_mixpanel.{$name}";
@@ -84,29 +63,26 @@ class GordalinaMixpanelExtension extends Extension
             $container->setAlias("mixpanel.{$name}", $id);
             $registry->addMethodCall(
                 'addProject',
-                array($id, "mixpanel.{$name}", new Reference($id))
+                [$id, "mixpanel.{$name}", new Reference($id)]
             );
-            $registry->addMethodCall('setConfig', array($id, $project));
+            $registry->addMethodCall('setConfig', [$id, $project]);
         }
 
-        $container->setAlias("mixpanel.default", "gordalina_mixpanel.{$default}");
-        $container->setAlias("mixpanel", "gordalina_mixpanel.{$default}");
+        $container->setAlias('mixpanel.default', "gordalina_mixpanel.{$default}");
+        $container->setAlias('mixpanel', "gordalina_mixpanel.{$default}");
 
-        $registry->addMethodCall('addAlias', array("mixpanel.default", "gordalina_mixpanel.{$default}"));
-        $registry->addMethodCall('addAlias', array("mixpanel", "gordalina_mixpanel.{$default}"));
+        $registry->addMethodCall('addAlias', ['mixpanel.default', "gordalina_mixpanel.{$default}"]);
+        $registry->addMethodCall('addAlias', ['mixpanel', "gordalina_mixpanel.{$default}"]);
 
         foreach ($config['users'] as $class => $user) {
-            $registry->addMethodCall('addUser', array($class, $user));
+            $registry->addMethodCall('addUser', [$class, $user]);
         }
     }
 
-    /**
-     * @param  array            $config
-     * @param  ContainerBuilder $container
-     * @return null
-     */
     private function loadParameters(array $config, ContainerBuilder $container)
     {
+        $container->setParameter('gordalina_mixpanel.enabled', $config['enabled']);
         $container->setParameter('gordalina_mixpanel.enable_profiler', $config['enable_profiler']);
+        $container->setParameter('gordalina_mixpanel.auto_update_user', $config['auto_update_user']);
     }
 }

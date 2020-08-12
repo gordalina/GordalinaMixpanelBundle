@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -9,34 +11,33 @@
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle;
+namespace Gordalina\MixpanelBundle\Mixpanel;
 
 class ManagerRegistry
 {
     /**
      * @var array
      */
-    private $projects = array();
+    private $projects = [];
 
     /**
      * @var array
      */
-    private $alias = array();
+    private $alias = [];
 
     /**
      * @var array
      */
-    private $config = array();
+    private $config = [];
 
     /**
      * @var array
      */
-    private $users = array();
+    private $users = [];
 
     /**
-     * @param string   $id
-     * @param string   $alias
-     * @param Mixpanel $project
+     * @param string $id
+     * @param string $alias
      */
     public function addProject($id, $alias, \Mixpanel $project)
     {
@@ -66,7 +67,6 @@ class ManagerRegistry
 
     /**
      * @param string $id
-     * @param array $config
      */
     public function setConfig($id, array $config)
     {

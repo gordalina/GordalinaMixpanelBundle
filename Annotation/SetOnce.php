@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -32,7 +34,7 @@ final class SetOnce extends Annotation
     public $props;
 
     /**
-     * @var boolean
+     * @var bool
      */
     public $ignoreTime;
 }

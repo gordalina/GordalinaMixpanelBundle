@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -9,9 +11,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\EventListener;
+namespace Gordalina\MixpanelBundle\Mixpanel\EventListener;
 
-use Gordalina\MixpanelBundle\Mixpanel\Flusher;
+use Gordalina\MixpanelBundle\Mixpanel\Mixpanel\Flusher;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 
 class FinishRequestListener
@@ -21,18 +23,11 @@ class FinishRequestListener
      */
     private $flusher;
 
-    /**
-     * @param Flusher $flusher
-     */
     public function __construct(Flusher $flusher)
     {
         $this->flusher = $flusher;
     }
 
-    /**
-     * @param  FinishRequestEvent $e
-     * @return null
-     */
     public function onFinishRequest(FinishRequestEvent $e)
     {
         $this->flusher->flush();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the mixpanel bundle.
  *
@@ -9,15 +11,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\DataCollector;
+namespace Gordalina\MixpanelBundle\Mixpanel\DataCollector;
 
-use Gordalina\MixpanelBundle\ManagerRegistry;
+use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
+use Gordalina\MixpanelBundle\Mixpanel\Mixpanel\Flusher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
-use Symfony\Component\Stopwatch\Stopwatch;
-use Gordalina\MixpanelBundle\Mixpanel\Flusher;
 
 class MixpanelDataCollector extends DataCollector implements LateDataCollectorInterface
 {
@@ -31,33 +32,23 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
      */
     private $flusher;
 
-    /**
-     * @param  ManagerRegistry  $registry
-     * @param  Flusher $flusher
-     */
     public function __construct(ManagerRegistry $registry, Flusher $flusher)
     {
         $this->registry = $registry;
-        $this->flusher = $flusher;
+        $this->flusher  = $flusher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function collect(Request $request, Response $response, \Exception $exception = null)
+    public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
-        $this->data = array(
-            'mixpanel' => array(),
+        $this->data = [
+            'mixpanel' => [],
             'projects' => $this->registry->getAlias(),
-            'users' => $this->registry->getUsers(),
-            'config' => $this->registry->getConfig(),
-            'time' => 0,
-        );
+            'users'    => $this->registry->getUsers(),
+            'config'   => $this->registry->getConfig(),
+            'time'     => 0,
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lateCollect()
     {
         // lets collect the time by flushing the queue
@@ -65,43 +56,64 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
         $this->flusher->flush();
 
         $this->data['mixpanel'] = $this->flusher->getData();
-        $this->data['time'] = $this->flusher->getTime();
+        $this->data['time']     = $this->flusher->getTime();
+    }
+
+    public function reset()
+    {
+        $this->data = [];
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getTotal()
     {
-        return array_reduce($this->data['mixpanel'], function ($carry, $item) {
-            // $item is a project
-            return array_reduce($item, function ($carry, $item) {
-                // $item is an event or people
-                return $carry += count($item);
-            }, $carry);
-        }, 0);
+        return array_reduce(
+            $this->data['mixpanel'],
+            function ($carry, $item) {
+                // $item is a project
+                return array_reduce(
+                    $item,
+                    function ($carry, $item) {
+                        // $item is an event or people
+                        return $carry += count($item);
+                    },
+                    $carry
+                );
+            },
+            0
+        );
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getEventCount()
     {
-        return array_reduce($this->data['mixpanel'], function ($carry, $item) {
-            // $item is a project
-            return $carry += count($item['events']);
-        }, 0);
+        return array_reduce(
+            $this->data['mixpanel'],
+            function ($carry, $item) {
+                // $item is a project
+                return $carry += count($item['events']);
+            },
+            0
+        );
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getEngagementCount()
     {
-        return array_reduce($this->data['mixpanel'], function ($carry, $item) {
-            // $item is a project
-            return $carry += count($item['people']);
-        }, 0);
+        return array_reduce(
+            $this->data['mixpanel'],
+            function ($carry, $item) {
+                // $item is a project
+                return $carry += count($item['people']);
+            },
+            0
+        );
     }
 
     /**
@@ -129,12 +141,13 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
     }
 
     /**
-     * @param  string $id
+     * @param string $id
+     *
      * @return array
      */
     public function getEvents($id)
     {
-        $data = array();
+        $data = [];
 
         foreach ($this->data['mixpanel'][$id]['events'] as $event) {
             $data[$event['event']] = $event['properties'];
@@ -144,12 +157,13 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
     }
 
     /**
-     * @param  string $id
+     * @param string $id
+     *
      * @return array
      */
     public function getEngagement($id)
     {
-        $data = array();
+        $data = [];
 
         foreach ($this->data['mixpanel'][$id]['people'] as $people) {
             $data[] = $people;
@@ -159,7 +173,7 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getTime()
     {
