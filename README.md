@@ -1,6 +1,8 @@
 GordalinaMixpanelBundle
 =====================
 
+[![Build Status](https://travis-ci.org/gordalina/GordalinaMixpanelBundle.svg?branch=master)](https://travis-ci.org/gordalina/GordalinaMixpanelBundle)
+
 Integration of the [**Mixpanel**](https://github.com/mixpanel/mixpanel-php) library
 into Symfony.
 
