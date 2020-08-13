@@ -1,21 +1,41 @@
-### v3.0
+## [v3.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/3.0.0)
 
-- Changed autoload from PSR-0 to PSR-4
-- v3 now supports Symfony 4.4+ and Symfony 5.0+
-- Uses version ~2.8 of `mixpanel/mixpanel-php`
-- Using the autowiring
-- Remove compatibility with old Symfony versions not maintained
-- Setting up Travis + Php-cs Fixer
-- Add ``auto_update_user`` parameter in order to send user data on each request
-- Add ``enable`` parameter in order to enable/disable send data to Mixpanel
-- Add ``extra_data`` config to send more user data
-- Create ``MixpanelEvent`` if you want to send data without annotation
-- Be able to use ``Expression`` in props
+[2.6.2.3...3.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/2.6.2.3...3.0.0)
+
+### Features
+
+- Added support for Symfony 4.4+ and 5+
+- Upgrade `mixpanel/mixpanel-php` from ~2.6 to ~2.8 
+- Configuration: add `enabled` parameter, to enable/disable data sending to Mixpanel
+- Configuration: add `auto_update_user` parameter, to automatically send user-related data on each request
+- Configuration: add `extra_data` parameter, to send more user-related data on each request
+- Create `MixpanelEvent` event, to send data to Mixpanel without using annotation. Example:
 ```php
-* @Mixpanel\Track("Order Completed", props={
-*      "user": @Mixpanel\Expression("user.getId()")
-* })
-```
-- Some fixes (event name, getId not exist, ...)
-- Update Readme
+$annotation = new Annotation\Track();
+$annotation->event = 'My event';
+$annotation->props = [
+  'prop 1' => 'data 1',
+  'prop 2' => 'data 2',
+];
 
+$eventDispatcher->dispatch(new MixpanelEvent($annotation, $request));
+```
+- Annotation `Mixpanel\Expression` can now be used in props. Example, to send the current user's ID:
+```php
+/**
+ * @Mixpanel\Track("Order Completed", props={
+ *     "user": @Mixpanel\Expression("user.getId()")
+ * })
+ */
+```
+
+### Breaking changes
+
+- PHP 7.1 support has been removed
+- Symfony 4.3 support has been removed
+- Autoloading has been changed from PSR-0 to PSR-4
+
+### Chores
+
+- Setup CI with Travis
+- Add PHP-CS-Fixer and lint code
