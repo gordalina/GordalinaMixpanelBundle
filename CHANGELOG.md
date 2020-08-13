@@ -4,7 +4,7 @@
 
 ### Features
 
-- Added support for Symfony 4.4+ and 5+
+- Added support for Symfony ^4.4 and ^5.0
 - Upgrade `mixpanel/mixpanel-php` from ~2.6 to ~2.8 
 - Configuration: add `enabled` parameter, to enable/disable data sending to Mixpanel
 - Configuration: add `auto_update_user` parameter, to automatically send user-related data on each request
@@ -32,7 +32,7 @@ $eventDispatcher->dispatch(new MixpanelEvent($annotation, $request));
 ### Breaking changes
 
 - PHP 7.1 support has been removed
-- Symfony 4.3 support has been removed
+- Symfony 2.6 and ^3.0 support has been removed, Symfony 4.3 is not supported
 - Autoloading has been changed from PSR-0 to PSR-4
 
 ### Chores
