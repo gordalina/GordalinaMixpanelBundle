@@ -13,7 +13,7 @@ class UserDataSpec extends ObjectBehavior
 {
     public function let(TokenStorageInterface $tokenStorage, ManagerRegistry $registry)
     {
-        $this->beConstructedWith($tokenStorage, $registry);
+        $this->beConstructedWith($tokenStorage, $registry, true);
     }
 
     public function it_is_initializable()
