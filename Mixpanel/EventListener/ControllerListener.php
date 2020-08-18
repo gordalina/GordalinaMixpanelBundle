@@ -96,7 +96,7 @@ class ControllerListener
     {
         $element = null;
 
-        if ($key === 'condition') {
+        if ('condition' === $key) {
             if (null === $value) {
                 $annotation->condition = true;
 
