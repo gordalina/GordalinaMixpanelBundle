@@ -113,7 +113,7 @@ class ControllerListener
         }
 
         if ($value instanceof Annotation\Expression) {
-            $element = $this->expressionLanguage->evaluate($value->expression, $request->attributes->all());
+            $element = $this->expressionLanguage->evaluate($value->expression, array_merge($request->attributes->all(), ['request' => $request]));
         }
 
         if (null === $element) {
