@@ -41,10 +41,16 @@ class UserData
      */
     private $registry;
 
-    public function __construct(TokenStorageInterface $tokenStorage, ManagerRegistry $registry)
+    /**
+     * @var bool
+     */
+    private $displayErrors;
+
+    public function __construct(TokenStorageInterface $tokenStorage, ManagerRegistry $registry, bool $displayErrors)
     {
-        $this->tokenStorage = $tokenStorage;
-        $this->registry     = $registry;
+        $this->tokenStorage  = $tokenStorage;
+        $this->registry      = $registry;
+        $this->displayErrors = $displayErrors;
     }
 
     /**
@@ -109,7 +115,15 @@ class UserData
                 foreach ($properties as $key => $prop) {
                     if ('extra_data' === $key) {
                         foreach ($prop as $element) {
-                            $this->properties[$className][$element['key']] = $this->accessor->getValue($instance, $element['value']);
+                            try {
+                                $this->properties[$className][$element['key']] = $this->accessor->getValue($instance, $element['value']);
+                            } catch (\Exception $e) {
+                                if ($this->displayErrors) {
+                                    throw $e;
+                                }
+
+                                $this->properties[$className][$element['key']] = null;
+                            }
                         }
                         continue;
                     }
