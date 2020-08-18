@@ -24,4 +24,9 @@ abstract class Annotation
      * @var string
      */
     public $project;
+
+    /**
+     * @var Gordalina\MixpanelBundle\Annotation\Expression
+     */
+    public $condition = true;
 }

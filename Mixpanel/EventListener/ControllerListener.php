@@ -70,7 +70,9 @@ class ControllerListener
             foreach ($collection as $annotation) {
                 if ($annotation instanceof Annotation\Annotation) {
                     $this->prepareAnnotation($annotation, $event->getRequest());
-                    $this->eventDispatcher->dispatch(new MixpanelEvent($annotation, $event->getRequest()));
+                    if ($annotation->condition) {
+                        $this->eventDispatcher->dispatch(new MixpanelEvent($annotation, $event->getRequest()));
+                    }
                 }
             }
         }
@@ -99,7 +101,7 @@ class ControllerListener
         }
 
         if ($value instanceof Annotation\Expression) {
-            $element = $this->expressionLanguage->evaluate($value->expression, $request->attributes->all());
+            $element = $this->expressionLanguage->evaluate($value->expression, array_merge($request->attributes->all(), ['request' => $request]));
         }
 
         if (null === $element) {
