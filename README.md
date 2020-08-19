@@ -329,10 +329,10 @@ You'll find the reference configuration below:
 # app/config/config*.yml
 
 gordalina_mixpanel:
-    enabled: true                                 # defaults to true
-    enable_profiler: %kernel.debug%               # defaults to %kernel.debug%
-    auto_update_user: %kernel.debug%              # defaults to %kernel.debug%
-    user_data_display_errors: %kernel.debug%      # defaults to %kernel.debug%
+    enabled: true                                        # defaults to true
+    enable_profiler: %kernel.debug%                      # defaults to %kernel.debug%
+    auto_update_user: %kernel.debug%                     # defaults to %kernel.debug%
+    throw_on_user_data_attribute_failure: %kernel.debug% # defaults to %kernel.debug%
     projects:
         default:
             token: xxxxxxxxxxxxxxxxxxxxxxxxxxxx # required
