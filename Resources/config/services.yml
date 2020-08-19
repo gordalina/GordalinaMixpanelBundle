@@ -8,7 +8,7 @@ services:
             $sendDataToMixpanel: '%gordalina_mixpanel.enabled%'
             $autoUpdateUser: '%gordalina_mixpanel.auto_update_user%'
             $enableProfiler: '%gordalina_mixpanel.enable_profiler%'
-            $displayErrors: '%gordalina_mixpanel.user_data_display_errors%'
+            $displayErrors: '%gordalina_mixpanel.throw_on_user_data_attribute_failure%'
 
     Gordalina\MixpanelBundle\Mixpanel\:
         resource: '../../Mixpanel/*'
