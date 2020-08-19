@@ -69,8 +69,9 @@ class ControllerListener
         foreach ([$classAnnotations, $methodAnnotations] as $collection) {
             foreach ($collection as $annotation) {
                 if ($annotation instanceof Annotation\Annotation) {
-                    $this->prepareAnnotation($annotation, $event->getRequest());
-                    if ($annotation->condition) {
+                    $this->handleCondition($annotation, $event->getRequest());
+                    if (true === $annotation->condition) {
+                        $this->prepareAnnotation($annotation, $event->getRequest());
                         $this->eventDispatcher->dispatch(new MixpanelEvent($annotation, $event->getRequest()));
                     }
                 }
@@ -92,28 +93,27 @@ class ControllerListener
         }
     }
 
+    private function handleCondition(Annotation\Annotation $annotation, Request $request)
+    {
+        $value = $annotation->condition;
+
+        if (null !== $value) {
+            $annotation->condition = $this->expressionLanguage->evaluate($value, array_merge(['request' => $request], $request->attributes->all()));
+        } else {
+            $annotation->condition = true;
+        }
+    }
+
     private function updateDataAnnotation(Annotation\Annotation $annotation, Request $request, string $key, $value, ?string $parentKey = null)
     {
         $element = null;
-
-        if ('condition' === $key) {
-            if (null === $value) {
-                $annotation->condition = true;
-
-                return;
-            }
-
-            $annotation->condition = $this->expressionLanguage->evaluate($value, array_merge(['request' => $request], $request->attributes->all()));
-
-            return;
-        }
 
         if ($value instanceof Annotation\Id) {
             $element = $this->userData->getId();
         }
 
         if ($value instanceof Annotation\Expression) {
-            $element = $this->expressionLanguage->evaluate($value->expression, $request->attributes->all());
+            $element = $this->expressionLanguage->evaluate($value->expression, array_merge($request->attributes->all(), ['request' => $request]));
         }
 
         if (null === $element) {
