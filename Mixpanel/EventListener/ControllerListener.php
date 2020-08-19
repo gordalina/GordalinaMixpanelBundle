@@ -70,7 +70,9 @@ class ControllerListener
             foreach ($collection as $annotation) {
                 if ($annotation instanceof Annotation\Annotation) {
                     $this->prepareAnnotation($annotation, $event->getRequest());
-                    $this->eventDispatcher->dispatch(new MixpanelEvent($annotation, $event->getRequest()));
+                    if ($annotation->condition) {
+                        $this->eventDispatcher->dispatch(new MixpanelEvent($annotation, $event->getRequest()));
+                    }
                 }
             }
         }
@@ -93,6 +95,18 @@ class ControllerListener
     private function updateDataAnnotation(Annotation\Annotation $annotation, Request $request, string $key, $value, ?string $parentKey = null)
     {
         $element = null;
+
+        if ('condition' === $key) {
+            if (null === $value) {
+                $annotation->condition = true;
+
+                return;
+            }
+
+            $annotation->condition = $this->expressionLanguage->evaluate($value, array_merge(['request' => $request], $request->attributes->all()));
+
+            return;
+        }
 
         if ($value instanceof Annotation\Id) {
             $element = $this->userData->getId();

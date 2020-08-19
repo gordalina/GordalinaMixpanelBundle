@@ -216,6 +216,21 @@ e.g: `@Mixpanel\Expression("<expression>")` or `@Mixpanel\Set("<property>", valu
 **Note**: All `id` properties can be omitted, as they will be set with the id of
 the current user in `security.context`
 
+### Send an event based on a condition
+
+In all annotations, you can add conditions with [Expression Language](https://symfony.com/doc/current/components/expression_language.html)
+```php
+/**
+* @Mixpanel\Track("Your event", condition="request.getMethod() in ['GET']")
+*/
+public function yourAction()
+{
+  // ...
+}
+```
+
+**Note**: By default condition is true and is not required.
+
 ### MixpanelEvent
 
 You can also send an event through symfony events when the annotations are not sufficient like this:
