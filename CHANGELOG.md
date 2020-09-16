@@ -1,3 +1,38 @@
+## [v3.2.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/3.1.0)
+
+[3.1.0...3.2.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/3.1.0...3.2.0)
+
+### Features
+
+- Used `Profile properties`. [#16](https://github.com/gordalina/GordalinaMixpanelBundle/pull/16) by @RomulusED69
+
+### Breaking changes
+
+- In your config file replace
+
+```yaml
+Symfony\Component\Security\Core\User\UserInterface:
+  id: username
+  email: email
+...
+  first_name: first_name
+  last_name: last_name
+  email: email
+  phone: phone
+```
+
+By
+```yaml
+Symfony\Component\Security\Core\User\UserInterface:
+  id: username
+  $email: email
+...
+  $first_name: first_name
+  $last_name: last_name
+  $email: email
+  $phone: phone
+```
+
 ## [v3.1.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/3.1.0)
 
 [3.0.0...3.1.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/3.0.0...3.1.0)
