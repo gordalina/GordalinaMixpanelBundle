@@ -6,7 +6,7 @@
 
 - Used `Profile properties`. [#16](https://github.com/gordalina/GordalinaMixpanelBundle/pull/16) by @RomulusED69
 
-### Breaking changes
+### Deprecations
 
 - In your config file replace
 
@@ -20,7 +20,6 @@ Symfony\Component\Security\Core\User\UserInterface:
   email: email
   phone: phone
 ```
-
 By
 ```yaml
 Symfony\Component\Security\Core\User\UserInterface:

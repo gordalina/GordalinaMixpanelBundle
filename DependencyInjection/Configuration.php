@@ -29,11 +29,17 @@ class Configuration implements ConfigurationInterface
     private $debug;
 
     /**
+     * @var int
+     */
+    private $symfonyVersion;
+
+    /**
      * @param bool $debug
      */
     public function __construct($debug)
     {
         $this->debug = $debug;
+        $this->symfonyVersion = \Symfony\Component\HttpKernel\Kernel::MAJOR_VERSION;
     }
 
     /**
@@ -69,12 +75,33 @@ class Configuration implements ConfigurationInterface
                             ->then(function ($v) {
                                 return ['id' => $v];
                             })
+                            ->ifTrue(function ($keys) {
+                                foreach ($keys as $key => $value) {
+                                    if (isset($keys['$'.$key])) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            })
+                            ->thenInvalid('Duplicate variable in %s. Prefer use var with $ if var is reserved properties.')
                         ->end()
                         ->children()
                             ->scalarNode('id')->isRequired()->end()
+                            ->scalarNode('first_name')
+                                ->setDeprecated($this->symfonyVersion === 4 ? 'The "%node%" option at path "%path%" is deprecated. Use "$first_name" instead.':'gordalina/mixpanel-bundle', '3.2', 'The "%node%" option at path "%path%" is deprecated. Use "$first_name" instead.')
+                            ->end()
                             ->scalarNode('$first_name')->end()
+                            ->scalarNode('last_name')
+                                ->setDeprecated($this->symfonyVersion === 4 ? 'The "%node%" option at path "%path%" is deprecated. Use "$last_name" instead.':'gordalina/mixpanel-bundle', '3.2', 'The "%node%" option at path "%path%" is deprecated. Use "$last_name" instead.')
+                            ->end()
                             ->scalarNode('$last_name')->end()
+                            ->scalarNode('email')
+                                ->setDeprecated($this->symfonyVersion === 4 ? 'The "%node%" option at path "%path%" is deprecated. Use "$email" instead.':'gordalina/mixpanel-bundle', '3.2', 'The "%node%" option at path "%path%" is deprecated. Use "$email" instead.')
+                            ->end()
                             ->scalarNode('$email')->end()
+                            ->scalarNode('phone')
+                                ->setDeprecated($this->symfonyVersion === 4 ? 'The "%node%" option at path "%path%" is deprecated. Use "$phone" instead.':'gordalina/mixpanel-bundle', '3.2', 'The "%node%" option at path "%path%" is deprecated. Use "$phone" instead.')
+                            ->end()
                             ->scalarNode('$phone')->end()
                             ->arrayNode('extra_data')
                                 ->info('Non-default properties in Mixpanel user profile')
