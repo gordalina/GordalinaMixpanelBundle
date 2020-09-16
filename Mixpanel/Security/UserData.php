@@ -67,7 +67,7 @@ class UserData
 
     /**
      * @param object $instance
-     * @param string $property id|first_name|last_name|email|phone
+     * @param string $property id|'$first_name'|'$last_name'|'$email'|'$phone'
      *
      * @return mixed
      */

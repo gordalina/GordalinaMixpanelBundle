@@ -125,10 +125,10 @@ gordalina_mixpanel:
         # All possible properties
         YourAppBundle\Entity\User:
             id: id
-            first_name: first_name
-            last_name: last_name
-            email: email
-            phone: phone
+            $first_name: first_name
+            $last_name: last_name
+            $email: email
+            $phone: phone
             extra_data:
                 - { key: whatever, value: test }
 ```
@@ -369,15 +369,15 @@ gordalina_mixpanel:
     users:
         Symfony\Component\Security\Core\User\UserInterface:
             id: username
-            email: email
+            $email: email
 
         # All possible properties
         YourAppBundle\Entity\User:
             id: id
-            first_name: first_name
-            last_name: last_name
-            email: email
-            phone: phone
+            $first_name: first_name
+            $last_name: last_name
+            $email: email
+            $phone: phone
 ```
 
 Spec
