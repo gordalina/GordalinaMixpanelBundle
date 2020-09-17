@@ -78,7 +78,7 @@ class Configuration implements ConfigurationInterface
                                 }
                                 return false;
                             })
-                            ->thenInvalid('Duplicate variable in %s. Prefer use var with $ if var is reserved properties.')
+                            ->thenInvalid('Duplicated property found in %s. If this variable is a MixPanel reserved property, please prefix it by "$".')
                         ->end()
                         ->children()
                             ->scalarNode('id')->isRequired()->end()
