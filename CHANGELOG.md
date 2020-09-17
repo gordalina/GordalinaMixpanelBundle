@@ -14,7 +14,7 @@
 Symfony\Component\Security\Core\User\UserInterface:
   id: username
   email: email
-YourAppBundle\Entity\User:
+App\Entity\User:
   id: id
   first_name: first_name
   last_name: last_name
@@ -26,7 +26,7 @@ By
 Symfony\Component\Security\Core\User\UserInterface:
   id: username
   $email: email
-YourAppBundle\Entity\User:
+App\Entity\User:
   id: id
   $first_name: first_name
   $last_name: last_name
