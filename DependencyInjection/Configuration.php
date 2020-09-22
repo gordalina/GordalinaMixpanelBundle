@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -69,13 +70,34 @@ class Configuration implements ConfigurationInterface
                             ->then(function ($v) {
                                 return ['id' => $v];
                             })
+                            ->ifTrue(function ($keys) {
+                                foreach ($keys as $key => $value) {
+                                    if (isset($keys['$'.$key])) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            })
+                            ->thenInvalid('Duplicated property found in %s. If this variable is a MixPanel reserved property, please prefix it by "$".')
                         ->end()
                         ->children()
                             ->scalarNode('id')->isRequired()->end()
-                            ->scalarNode('first_name')->end()
-                            ->scalarNode('last_name')->end()
-                            ->scalarNode('email')->end()
-                            ->scalarNode('phone')->end()
+                            ->scalarNode('first_name')
+                                ->setDeprecated(...$this->getDeprecationParams('The "%node%" option at path "%path%" is deprecated. Use "$first_name" instead.'))
+                            ->end()
+                            ->scalarNode('$first_name')->end()
+                            ->scalarNode('last_name')
+                                ->setDeprecated(...$this->getDeprecationParams('The "%node%" option at path "%path%" is deprecated. Use "$last_name" instead.'))
+                            ->end()
+                            ->scalarNode('$last_name')->end()
+                            ->scalarNode('email')
+                                ->setDeprecated(...$this->getDeprecationParams('The "%node%" option at path "%path%" is deprecated. Use "$email" instead.'))
+                            ->end()
+                            ->scalarNode('$email')->end()
+                            ->scalarNode('phone')
+                                ->setDeprecated(...$this->getDeprecationParams('The "%node%" option at path "%path%" is deprecated. Use "$phone" instead.'))
+                            ->end()
+                            ->scalarNode('$phone')->end()
                             ->arrayNode('extra_data')
                                 ->info('Non-default properties in Mixpanel user profile')
                                 ->prototype('array')
@@ -152,5 +174,21 @@ class Configuration implements ConfigurationInterface
         ;
 
         return $node;
+    }
+
+    /**
+     * @return array<int,string>
+     */
+    private function getDeprecationParams(string $message): array
+    {
+        if (method_exists(BaseNode::class, 'getDeprecation')) {
+            return [
+                'gordalina/mixpanel-bundle',
+                '3.2',
+                $message,
+            ];
+        }
+
+        return [$message];
     }
 }

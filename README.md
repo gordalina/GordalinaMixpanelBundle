@@ -120,15 +120,15 @@ gordalina_mixpanel:
     users:
         Symfony\Component\Security\Core\User\UserInterface:
             id: username
-            email: email
+            $email: email
 
         # All possible properties
         YourAppBundle\Entity\User:
             id: id
-            first_name: first_name
-            last_name: last_name
-            email: email
-            phone: phone
+            $first_name: first_name
+            $last_name: last_name
+            $email: email
+            $phone: phone
             extra_data:
                 - { key: whatever, value: test }
 ```
@@ -193,14 +193,14 @@ class OrderController
 **Events**
 - `@Mixpanel\Register(prop="visits", value=3)`
 - `@Mixpanel\Track(event="name", props={ "firstTime": true })`
-- `@Mixpanel\Unregister(prop="email")`
+- `@Mixpanel\Unregister(prop="$email")`
 
 **Engagement**
 - `@Mixpanel\Append(id=324, prop="fruits", value="apples" [, ignoreTime=false])`
 - `@Mixpanel\ClearCharges(id=324 [, ignoreTime=false])`
 - `@Mixpanel\DeleteUser(id=324 [, ignoreTime=false])`
 - `@Mixpanel\Increment(id=324, prop="visits", value=3 [, ignoreTime=false])`
-- `@Mixpanel\Remove(id=324, prop="email")`
+- `@Mixpanel\Remove(id=324, prop="$email")`
 - `@Mixpanel\Set(id=324, props={ "firstTime": true } [, ignoreTime=false])`
 - `@Mixpanel\SetOnce(id=324, props={ "firstTime": true } [, ignoreTime=false])`
 - `@Mixpanel\TrackCharge(id=697, amount="20.0" [, ignoreTime=false])`
@@ -369,15 +369,15 @@ gordalina_mixpanel:
     users:
         Symfony\Component\Security\Core\User\UserInterface:
             id: username
-            email: email
+            $email: email
 
         # All possible properties
         YourAppBundle\Entity\User:
             id: id
-            first_name: first_name
-            last_name: last_name
-            email: email
-            phone: phone
+            $first_name: first_name
+            $last_name: last_name
+            $email: email
+            $phone: phone
 ```
 
 Spec
