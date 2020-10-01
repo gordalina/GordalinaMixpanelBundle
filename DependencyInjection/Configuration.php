@@ -127,10 +127,10 @@ class Configuration implements ConfigurationInterface
 
     public function addMixpanelOptionsNode()
     {
-        $builder = new TreeBuilder();
-        $node    = $builder->root('options');
+        $treeBuilder = new TreeBuilder('options');
+        $rootNode    = $treeBuilder->getRootNode();
 
-        $node
+        $rootNode
             ->addDefaultsIfNotSet()
             ->children()
                 ->integerNode('max_batch_size')
@@ -173,7 +173,7 @@ class Configuration implements ConfigurationInterface
             ->end()
         ;
 
-        return $node;
+        return $rootNode;
     }
 
     /**
