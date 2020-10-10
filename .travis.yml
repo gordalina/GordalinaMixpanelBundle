@@ -29,7 +29,7 @@ matrix:
 
         # Test specific Symfony versions
         - php: 7.4
-          env: SYMFONY_VERSION="4.4.11" # LTS
+          env: SYMFONY_VERSION="4.4.13" # LTS
         - php: 7.4
           env: SYMFONY_VERSION="4.*" # Last 4.x version
         - php: 7.4
