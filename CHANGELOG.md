@@ -1,4 +1,12 @@
-## [v3.2.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/3.1.0)
+## [v3.3.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/3.3.0)
+
+[3.2.0...3.3.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/3.2.0...3.3.0)
+
+### Security Fixes
+
+- Upgraded `symfony/http-kernel` to `^4.4.13 || 5.1.5` to address [CVE-2020-15094](https://github.com/advisories/GHSA-754h-5r27-7x3r)
+
+## [v3.2.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/3.2.0)
 
 [3.1.0...3.2.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/3.1.0...3.2.0)
 
@@ -21,7 +29,9 @@ App\Entity\User:
   email: email
   phone: phone
 ```
+
 By
+
 ```yaml
 Symfony\Component\Security\Core\User\UserInterface:
   id: username
