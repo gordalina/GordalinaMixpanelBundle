@@ -54,6 +54,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('send_user_ip')
                     ->info('Send user ip as part of the user data')
                     ->defaultValue(true)
+                ->end()
                 ->booleanNode('auto_update_user')
                     ->info('Send data user on each master request (useful if you do not force users to disconnect when setting up the bundle or add new properties in their profile. WARNING: preferred used @Mixpanel\UpdateUser() or @Mixpanel\Set() at connection for performances)')
                     ->defaultValue($this->debug)
