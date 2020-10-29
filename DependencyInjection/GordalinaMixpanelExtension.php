@@ -83,6 +83,7 @@ class GordalinaMixpanelExtension extends Extension
     {
         $container->setParameter('gordalina_mixpanel.enabled', $config['enabled']);
         $container->setParameter('gordalina_mixpanel.enable_profiler', $config['enable_profiler']);
+        $container->setParameter('gordalina_mixpanel.send_user_ip', $config['send_user_ip']);
         $container->setParameter('gordalina_mixpanel.auto_update_user', $config['auto_update_user']);
         $container->setParameter('gordalina_mixpanel.throw_on_user_data_attribute_failure', $config['throw_on_user_data_attribute_failure']);
     }

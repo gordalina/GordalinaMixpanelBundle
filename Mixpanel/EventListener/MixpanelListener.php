@@ -9,6 +9,7 @@ use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
 use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
 use Gordalina\MixpanelBundle\Mixpanel\Security\UserData;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class MixpanelListener implements EventSubscriberInterface
 {
@@ -27,11 +28,17 @@ class MixpanelListener implements EventSubscriberInterface
      */
     private $sendDataToMixpanel;
 
-    public function __construct(ManagerRegistry $registry, UserData $userData, bool $sendDataToMixpanel)
+    /**
+     * @var bool
+     */
+    private $sendUserIpToMixpanel;
+
+    public function __construct(ManagerRegistry $registry, UserData $userData, bool $sendDataToMixpanel, bool $sendUserIpToMixpanel)
     {
-        $this->registry           = $registry;
-        $this->userData           = $userData;
-        $this->sendDataToMixpanel = $sendDataToMixpanel;
+        $this->registry             = $registry;
+        $this->userData             = $userData;
+        $this->sendDataToMixpanel   = $sendDataToMixpanel;
+        $this->sendUserIpToMixpanel = $sendUserIpToMixpanel;
     }
 
     public static function getSubscribedEvents()
@@ -58,23 +65,23 @@ class MixpanelListener implements EventSubscriberInterface
         } elseif ($annotation instanceof Annotation\Register) {
             $instance->register($annotation->prop, $annotation->value);
         } elseif ($annotation instanceof Annotation\Set) {
-            $instance->people->set($annotation->id, $annotation->props, $request->getClientIp(), (bool) $annotation->ignoreTime);
+            $instance->people->set($annotation->id, $annotation->props, $this->getUserIp($request), (bool) $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\SetOnce) {
-            $instance->people->setOnce($annotation->id, $annotation->props, $request->getClientIp(), (bool) $annotation->ignoreTime);
+            $instance->people->setOnce($annotation->id, $annotation->props, $this->getUserIp($request), (bool) $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\Remove) {
-            $instance->people->remove($annotation->id, $annotation->prop, $annotation->value, $request->getClientIp(), (bool) $annotation->ignoreTime);
+            $instance->people->remove($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), (bool) $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\Increment) {
-            $instance->people->increment($annotation->id, $annotation->prop, $annotation->value, $request->getClientIp(), (bool) $annotation->ignoreTime);
+            $instance->people->increment($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), (bool) $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\Append) {
-            $instance->people->append($annotation->id, $annotation->prop, $annotation->value, $request->getClientIp(), (bool) $annotation->ignoreTime);
+            $instance->people->append($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), (bool) $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\TrackCharge) {
-            $instance->people->trackCharge($annotation->id, $annotation->amount, $timestamp = null, $request->getClientIp(), (bool) $annotation->ignoreTime);
+            $instance->people->trackCharge($annotation->id, $annotation->amount, $timestamp = null, $this->getUserIp($request), (bool) $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\ClearCharges) {
             $instance->people->clearCharges($annotation->id, $request->getClientIp(), (bool) $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\UpdateUser) {
-            $instance->people->set($this->getId(), $this->getUserProperties(), $request->getClientIp());
+            $instance->people->set($this->getId(), $this->getUserProperties(), $this->getUserIp($request));
         } elseif ($annotation instanceof Annotation\DeleteUser) {
-            $instance->people->deleteUser($annotation->id, $request->getClientIp(), (bool) $annotation->ignoreTime);
+            $instance->people->deleteUser($annotation->id, $this->getUserIp($request), (bool) $annotation->ignoreTime);
         }
     }
 
@@ -93,6 +100,11 @@ class MixpanelListener implements EventSubscriberInterface
         unset($props['id']);
 
         return $props;
+    }
+
+    private function getUserIp(Request $request): ?string
+    {
+        return $this->sendUserIpToMixpanel ? $request->getClientIp() : null;
     }
 
     /**
