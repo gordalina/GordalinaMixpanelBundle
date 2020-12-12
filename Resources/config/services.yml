@@ -6,6 +6,7 @@ services:
         public: false
         bind:
             $sendDataToMixpanel: '%gordalina_mixpanel.enabled%'
+            $sendUserIpToMixpanel: '%gordalina_mixpanel.send_user_ip%'
             $autoUpdateUser: '%gordalina_mixpanel.auto_update_user%'
             $enableProfiler: '%gordalina_mixpanel.enable_profiler%'
             $displayErrors: '%gordalina_mixpanel.throw_on_user_data_attribute_failure%'
