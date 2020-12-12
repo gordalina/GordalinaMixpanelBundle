@@ -1,3 +1,11 @@
+## [v3.4.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/3.4.0)
+
+[3.3.0...3.4.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/3.3.0...3.4.0)
+
+### Features
+
+- Added a new configuration option `send_user_ip` which decides whether to send the user ip to mix panel. [#19](https://github.com/gordalina/GordalinaMixpanelBundle/pull/19)
+-
 ## [v3.3.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/3.3.0)
 
 [3.2.0...3.3.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/3.2.0...3.3.0)
