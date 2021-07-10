@@ -6,16 +6,20 @@ GordalinaMixpanelBundle
 Integration of the [**Mixpanel**](https://github.com/mixpanel/mixpanel-php) library
 into Symfony.
 
-
-* [Installation](#installation)
-* [Usage](#usage)
-  * [Killer Feature](#killer-feature)
-  * [Sending people information to Mixpanel](#sending-people-information-to-mixpanel)
-  * [Annotations](#annotations)
-  * [Symfony2 Profiler Integration](#symfony2-profiler-integration)
-* [Reference Configuration](#reference-configuration)
-* [License](#license)
-
+- [Installation](#installation)
+- [Usage](#usage)
+- [Killer Feature](#killer-feature)
+- [Sending people information to Mixpanel](#sending-people-information-to-mixpanel)
+- [Annotations](#annotations)
+    - [Mixpanel Actions](#mixpanel-actions)
+    - [Custom Annotations](#custom-annotations)
+- [Send an event based on a condition](#send-an-event-based-on-a-condition)
+- [MixpanelEvent](#mixpanelevent)
+- [Override Props in all Annotations](#override-props-in-all-annotations)
+- [Symfony Profiler Integration](#symfony-profiler-integration)
+- [Reference Configuration](#reference-configuration)
+- [Spec](#spec)
+- [License](#license)
 
 Installation
 ------------
@@ -253,7 +257,7 @@ public function edit(User $user, EventDispatcherInterface $eventDispatcher, Requ
         'prop 1' => 'data 1',
         'prop 2' => 'data 2',
     ];
-    
+
     $eventDispatcher->dispatch(new MixpanelEvent($annotation, $request));
     // Rest of your code
 }
@@ -291,7 +295,7 @@ class MixpanelListener
     public function __construct(Reader $annotationReader, Security $security)
     {
         $this->annotationReader = $annotationReader;
-        $this->security         = $security; 
+        $this->security         = $security;
     }
 
     public function onKernelController(ControllerEvent $event)
