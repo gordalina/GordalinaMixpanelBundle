@@ -1,0 +1,67 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - "*"
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  test:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      max-parallel: 15
+      matrix:
+        operating-system: [ubuntu-20.04, macOS-10.15]
+        php-versions: ["7.2", "7.3", "7.4", "8.0"]
+        symfony-versions: ["4.*", "5.*"]
+    name: Test PHP ${{ matrix.php-versions }} on ${{ matrix.operating-system }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, pcov
+          coverage: pcov
+
+      - name: Check PHP Version
+        run: php -v
+
+      - name: Check Composer Version
+        run: composer -V
+
+      - name: Check PHP Extensions
+        run: php -m
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+
+      - name: Set Symfony version
+        run: composer config extra.symfony.require ${{ matrix.symfony-versions }}
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Run test suite
+        run: $(composer config bin-dir)/phpunit --coverage-clover=coverage.clover
+
+      - name: Run phpspec
+        run: bin/phpspec run -f dot -n
+
+      - name: Run php-cs-fixer
+        run: bin/php-cs-fixer fix --verbose --diff --dry-run Mixpanel/
