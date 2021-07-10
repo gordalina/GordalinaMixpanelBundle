@@ -11,8 +11,8 @@
         }
     ],
     "require": {
-        "php": ">=7.2.5",
-        "symfony/framework-bundle": "^4.4 || >=5.0",
+        "php": "^7.2.5||^8.0",
+        "symfony/framework-bundle": "^4.4 || ^5.0",
         "symfony/expression-language": "^4.4 || ^5.0",
         "symfony/security-http": "^4.4 || ^5.0",
         "symfony/http-kernel": "^4.4.13 || ^5.1.5",
