@@ -1,7 +1,7 @@
 GordalinaMixpanelBundle
 =====================
 
-![Build Status](https://github.com/gordalina/GordalinaMixpanelBundle/actions/workflows/ci/badge.svg)
+[![Build Status](https://github.com/gordalina/GordalinaMixpanelBundle/workflows/ci/badge.svg)](https://github.com/gordalina/GordalinaMixpanelBundle/actions)
 
 Integration of the [**Mixpanel**](https://github.com/mixpanel/mixpanel-php) library
 into Symfony.
