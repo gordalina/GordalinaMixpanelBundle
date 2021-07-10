@@ -1,7 +1,11 @@
 {
     "name": "gordalina/mixpanel-bundle",
     "description": "Symfony bundle for Mixpanel",
-    "keywords": ["mixpanel", "bundle", "symfony"],
+    "keywords": [
+        "mixpanel",
+        "bundle",
+        "symfony"
+    ],
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
@@ -20,10 +24,12 @@
     },
     "require-dev": {
         "phpspec/phpspec": "^6.2",
-        "friendsofphp/php-cs-fixer": "^2.16.4"
+        "friendsofphp/php-cs-fixer": "^3.0"
     },
     "autoload": {
-      "psr-4": { "Gordalina\\MixpanelBundle\\": "" }
+        "psr-4": {
+            "Gordalina\\MixpanelBundle\\": ""
+        }
     },
     "config": {
         "bin-dir": "bin"

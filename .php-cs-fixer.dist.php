@@ -5,7 +5,8 @@ $finder = PhpCsFixer\Finder::create()
     ->exclude('var')
 ;
 
-return PhpCsFixer\Config::create()
+$config = new PhpCsFixer\Config();
+return $config
     ->setRiskyAllowed(true)
     ->setRules([
         '@Symfony' => true,
@@ -13,8 +14,7 @@ return PhpCsFixer\Config::create()
             'syntax' => 'short',
         ],
         'binary_operator_spaces' => [
-            'align_double_arrow' => true,
-            'align_equals' => true
+            'operators' => ['=>' => 'align', '=' => 'align']
         ],
         'no_unreachable_default_argument_value' => false,
         'braces' => [
