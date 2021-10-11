@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Event\AuthenticationEvent;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 
 class AuthenticationListener
@@ -74,6 +75,11 @@ class AuthenticationListener
     public function onInteractiveLogin(InteractiveLoginEvent $e)
     {
         $this->authentication->onAuthenticationSuccess($e->getAuthenticationToken());
+    }
+
+    public function onSuccessfulLogin(LoginSuccessEvent $event): void
+    {
+        $this->authentication->onAuthenticationSuccess($event->getAuthenticatedToken());
     }
 
     public function onKernelRequest(RequestEvent $e)

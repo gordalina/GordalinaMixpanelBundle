@@ -10,6 +10,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Event\AuthenticationEvent;
+use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 class AuthenticationListenerSpec extends ObjectBehavior
 {
@@ -33,5 +34,17 @@ class AuthenticationListenerSpec extends ObjectBehavior
         $authentication->onAuthenticationSuccess($token)->shouldBeCalled();
 
         $this->onAuthenticationSuccess($event);
+    }
+
+    public function it_should_pass_authenticated_token_to_authentication_service(
+        Authentication $authentication,
+        LoginSuccessEvent $event,
+        TokenInterface $token
+    ) {
+        $event->getAuthenticatedToken()->willReturn($token);
+
+        $authentication->onAuthenticationSuccess($token)->shouldBeCalled();
+
+        $this->onSuccessfulLogin($event);
     }
 }
