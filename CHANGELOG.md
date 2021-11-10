@@ -1,3 +1,15 @@
+## [v4.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/4.0.0)
+
+[3.5.0...4.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/3.5.0...4.0.0)
+
+### Breaking Changes
+
+- Dropped support for Symfony `<5.1.5`
+
+### Features
+
+- Register LoginSuccessEvent for new authenticator system. [#26](https://github.com/gordalina/GordalinaMixpanelBundle/pull/26)
+
 ## [v3.5.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/3.5.0)
 
 [3.4.0...3.5.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/3.4.0...3.5.0)
