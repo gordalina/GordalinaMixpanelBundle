@@ -86,7 +86,7 @@ class AuthenticationListener
     {
         $token = $this->tokenStorage->getToken();
 
-        if ($e->isMasterRequest() && $token instanceof TokenInterface) {
+        if ($e->isMainRequest() && $token instanceof TokenInterface) {
             $this->authentication->onAuthenticationSuccess($token);
 
             if (!$this->autoUpdateUser || !$this->sendDataToMixpanel) {
