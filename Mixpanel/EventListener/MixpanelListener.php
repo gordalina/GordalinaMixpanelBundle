@@ -87,7 +87,7 @@ class MixpanelListener implements EventSubscriberInterface
 
     private function getMixpanelInstance(?string $project = null): \Mixpanel
     {
-        if (!$project || strlen($project)) {
+        if (!$project || strlen($project) == 0) {
             return $this->registry->getProject('gordalina_mixpanel.default');
         } else {
             return $this->registry->getProject("gordalina_mixpanel.{$project}");
