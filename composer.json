@@ -16,10 +16,10 @@
     ],
     "require": {
         "php": "^8.0",
-        "symfony/framework-bundle": "^5.1.5 || ^6.0",
-        "symfony/expression-language": "^5.1.5 || ^6.0",
-        "symfony/security-http": "^5.1.5 || ^6.0",
-        "symfony/http-kernel": "^5.1.5 || ^6.0",
+        "symfony/framework-bundle": "^5.4 || ^6.0",
+        "symfony/expression-language": "^5.4 || ^6.0",
+        "symfony/security-http": "^5.4 || ^6.0",
+        "symfony/http-kernel": "^5.4 || ^6.0",
         "mixpanel/mixpanel-php": "~2.8"
     },
     "require-dev": {
