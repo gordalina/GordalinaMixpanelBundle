@@ -80,6 +80,7 @@ class Configuration implements ConfigurationInterface
                                         return true;
                                     }
                                 }
+
                                 return false;
                             })
                             ->thenInvalid('Duplicated property found in %s. If this variable is a MixPanel reserved property, please prefix it by "$".')

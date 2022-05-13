@@ -24,7 +24,7 @@
     },
     "require-dev": {
         "phpspec/phpspec": "^7.2",
-        "friendsofphp/php-cs-fixer": "^3.0"
+        "friendsofphp/php-cs-fixer": "^3.8"
     },
     "autoload": {
         "psr-4": {
