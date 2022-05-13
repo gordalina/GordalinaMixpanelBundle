@@ -25,9 +25,10 @@ class UserDataSpec extends ObjectBehavior
         TokenStorageInterface $tokenStorage,
         TokenInterface $token
     ) {
+
         $tokenStorage->getToken()->willReturn($token);
 
-        $token->getUser()->willReturn('anon.');
+        $token->getUser()->willReturn(null);
 
         $this->getProperties()->shouldReturn([]);
     }
