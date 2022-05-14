@@ -64,3 +64,6 @@ jobs:
 
       - name: Run php-cs-fixer
         run: bin/php-cs-fixer fix --verbose --diff --dry-run Mixpanel/
+
+      - name: Run PHPStan
+        run: bin/phpstan

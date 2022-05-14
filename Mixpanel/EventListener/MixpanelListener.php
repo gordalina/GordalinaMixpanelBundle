@@ -59,7 +59,7 @@ class MixpanelListener implements EventSubscriberInterface
         $instance   = $this->getMixpanelInstance($annotation->project);
 
         if ($annotation instanceof Annotation\Track) {
-            $instance->track($annotation->event, $annotation->props ?: []);
+            $instance->track($annotation->event, $annotation->props ?? []);
         } elseif ($annotation instanceof Annotation\Unregister) {
             $instance->unregister($annotation->prop);
         } elseif ($annotation instanceof Annotation\Register) {
@@ -69,7 +69,7 @@ class MixpanelListener implements EventSubscriberInterface
         } elseif ($annotation instanceof Annotation\SetOnce) {
             $instance->people->setOnce($annotation->id, $annotation->props, $this->getUserIp($request), (bool) $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\Remove) {
-            $instance->people->remove($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), (bool) $annotation->ignoreTime);
+            $instance->people->remove($annotation->id, $annotation->props, $this->getUserIp($request), (bool) $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\Increment) {
             $instance->people->increment($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), (bool) $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\Append) {
@@ -87,14 +87,14 @@ class MixpanelListener implements EventSubscriberInterface
 
     private function getMixpanelInstance(?string $project = null): \Mixpanel
     {
-        if (!$project || strlen($project)) {
+        if (null === $project || 0 === strlen(trim($project))) {
             return $this->registry->getProject('gordalina_mixpanel.default');
         } else {
             return $this->registry->getProject("gordalina_mixpanel.{$project}");
         }
     }
 
-    private function getUserProperties(): ?array
+    private function getUserProperties(): array
     {
         $props = $this->userData->getProperties();
         unset($props['id']);

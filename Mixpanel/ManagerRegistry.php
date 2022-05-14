@@ -31,7 +31,7 @@ class ManagerRegistry
     private $config = [];
 
     /**
-     * @var array
+     * @var array<string, string>
      */
     private $users = [];
 
@@ -89,6 +89,8 @@ class ManagerRegistry
         if (isset($this->projects[$id])) {
             return $this->projects[$id];
         }
+
+        throw new \LogicException(sprintf('Cannot find project with id "%s"', $id));
     }
 
     /**
@@ -108,9 +110,9 @@ class ManagerRegistry
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
-    public function getUsers()
+    public function getUsers(): array
     {
         return $this->users;
     }

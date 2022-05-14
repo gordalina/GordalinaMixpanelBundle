@@ -186,14 +186,6 @@ class Configuration implements ConfigurationInterface
      */
     private function getDeprecationParams(string $message): array
     {
-        if (method_exists(BaseNode::class, 'getDeprecation')) {
-            return [
-                'gordalina/mixpanel-bundle',
-                '3.2',
-                $message,
-            ];
-        }
-
         return [$message];
     }
 }
