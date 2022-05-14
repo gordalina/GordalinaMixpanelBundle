@@ -186,6 +186,10 @@ class Configuration implements ConfigurationInterface
      */
     private function getDeprecationParams(string $message): array
     {
-        return [$message];
+        return [
+            'gordalina/mixpanel-bundle',
+            '3.2',
+            $message,
+        ];
     }
 }
