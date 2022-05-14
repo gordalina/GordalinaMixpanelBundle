@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "29cfefc23d871185ecc864d12d4f33e7",
+    "content-hash": "0fd72b268a44730bd9bfb9429c7810a7",
     "packages": [
         {
             "name": "mixpanel/mixpanel-php",
