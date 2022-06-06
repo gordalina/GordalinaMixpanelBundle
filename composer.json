@@ -15,16 +15,19 @@
         }
     ],
     "require": {
-        "php": "^7.2.5 || ^8.0",
-        "symfony/framework-bundle": "^5.1.5",
-        "symfony/expression-language": "^5.1.5",
-        "symfony/security-http": "^5.1.5",
-        "symfony/http-kernel": "^5.1.5",
+        "php": "^8.0",
+        "symfony/framework-bundle": "^5.4 || ^6.0",
+        "symfony/expression-language": "^5.4 || ^6.0",
+        "symfony/security-http": "^5.4 || ^6.0",
+        "symfony/http-kernel": "^5.4 || ^6.0",
         "mixpanel/mixpanel-php": "~2.8"
     },
     "require-dev": {
-        "phpspec/phpspec": "^6.2",
-        "friendsofphp/php-cs-fixer": "^3.0"
+        "phpspec/phpspec": "^7.2",
+        "friendsofphp/php-cs-fixer": "^3.8",
+        "phpstan/phpstan": "^1.6",
+        "phpstan/phpstan-symfony": "^1.1",
+        "phpstan/phpstan-strict-rules": "^1.2"
     },
     "autoload": {
         "psr-4": {
@@ -36,7 +39,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0-dev"
+            "dev-master": "5.1-dev"
         }
     }
 }

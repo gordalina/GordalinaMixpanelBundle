@@ -47,7 +47,7 @@ class Flusher
     public function __construct(ManagerRegistry $registry, Stopwatch $stopwatch = null, bool $enableProfiler = false)
     {
         $this->registry       = $registry;
-        $this->stopwatch      = $stopwatch ?: new Stopwatch();
+        $this->stopwatch      = $stopwatch ?? new Stopwatch();
         $this->enableProfiler = $enableProfiler;
     }
 
@@ -117,8 +117,6 @@ class Flusher
      */
     private function getQueue(Mixpanel $project, string $propertyName, bool $isAccessible): array
     {
-        $queue = [];
-
         $rfl      = new \ReflectionClass($project);
         $property = $rfl->getProperty($propertyName);
 

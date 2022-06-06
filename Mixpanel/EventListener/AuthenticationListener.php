@@ -21,8 +21,8 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Event\AuthenticationEvent;
-use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 
@@ -67,7 +67,7 @@ class AuthenticationListener
         $this->authentication->onAuthenticationSuccess($e->getAuthenticationToken());
     }
 
-    public function onAuthenticationFailure(AuthenticationFailureEvent $e)
+    public function onAuthenticationFailure(LoginFailureEvent $e)
     {
         $this->authentication->onAuthenticationFailure();
     }
@@ -86,7 +86,7 @@ class AuthenticationListener
     {
         $token = $this->tokenStorage->getToken();
 
-        if ($e->isMasterRequest() && $token instanceof TokenInterface) {
+        if ($e->isMainRequest() && $token instanceof TokenInterface) {
             $this->authentication->onAuthenticationSuccess($token);
 
             if (!$this->autoUpdateUser || !$this->sendDataToMixpanel) {

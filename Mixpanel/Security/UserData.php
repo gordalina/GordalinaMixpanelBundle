@@ -95,7 +95,7 @@ class UserData
     public function getProperties($instance = null)
     {
         $instance = $this->getUser($instance);
-        if (empty($instance) || !is_object($instance)) {
+        if (null === $instance) {
             return [];
         }
         $className = get_class($instance);
@@ -105,34 +105,36 @@ class UserData
         }
 
         foreach ($this->registry->getUsers() as $class => $properties) {
-            if ($className === $class) {
-                if (!$this->accessor) {
-                    $this->accessor = PropertyAccess::createPropertyAccessor();
-                }
-
-                $this->properties[$className] = [];
-
-                foreach ($properties as $key => $prop) {
-                    if ('extra_data' === $key) {
-                        foreach ($prop as $element) {
-                            try {
-                                $this->properties[$className][$element['key']] = $this->accessor->getValue($instance, $element['value']);
-                            } catch (\Exception $e) {
-                                if ($this->displayErrors) {
-                                    throw $e;
-                                }
-
-                                $this->properties[$className][$element['key']] = null;
-                            }
-                        }
-                        continue;
-                    }
-
-                    $this->properties[$className][$key] = $this->accessor->getValue($instance, $prop);
-                }
-
-                return $this->properties[$className];
+            if ($className !== $class) {
+                continue;
             }
+
+            if (!$this->accessor) {
+                $this->accessor = PropertyAccess::createPropertyAccessor();
+            }
+
+            $this->properties[$className] = [];
+            foreach ($properties as $key => $prop) {
+                if ('extra_data' !== $key) {
+                    $this->properties[$className][$key] = $this->accessor->getValue($instance, $prop);
+
+                    continue;
+                }
+
+                foreach ($prop as $element) {
+                    try {
+                        $this->properties[$className][$element['key']] = $this->accessor->getValue($instance, $element['value']);
+                    } catch (\Exception $e) {
+                        if ($this->displayErrors) {
+                            throw $e;
+                        }
+
+                        $this->properties[$className][$element['key']] = null;
+                    }
+                }
+            }
+
+            return $this->properties[$className];
         }
     }
 

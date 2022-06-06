@@ -1,3 +1,12 @@
+## [v5.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.0.0)
+
+[4.0.0...5.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/4.0.0...5.0.0)
+
+### Breaking Changes
+
+- Dropped support for PHP `<8.0`
+- Dropped support for Symfony `<5.4`
+
 ## [v4.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/4.0.0)
 
 [3.5.0...4.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/3.5.0...4.0.0)

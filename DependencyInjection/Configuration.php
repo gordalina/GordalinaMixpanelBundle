@@ -80,6 +80,7 @@ class Configuration implements ConfigurationInterface
                                         return true;
                                     }
                                 }
+
                                 return false;
                             })
                             ->thenInvalid('Duplicated property found in %s. If this variable is a MixPanel reserved property, please prefix it by "$".')
@@ -185,14 +186,10 @@ class Configuration implements ConfigurationInterface
      */
     private function getDeprecationParams(string $message): array
     {
-        if (method_exists(BaseNode::class, 'getDeprecation')) {
-            return [
-                'gordalina/mixpanel-bundle',
-                '3.2',
-                $message,
-            ];
-        }
-
-        return [$message];
+        return [
+            'gordalina/mixpanel-bundle',
+            '3.2',
+            $message,
+        ];
     }
 }
