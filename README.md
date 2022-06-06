@@ -27,7 +27,7 @@ Installation
 Require [`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle) using composer
 
 ```sh
-$ php composer.phar require gordalina/mixpanel-bundle:~3.0
+$ php composer.phar require gordalina/mixpanel-bundle:~5.0
 ```
 
 Or require
@@ -38,7 +38,7 @@ to your `composer.json` file:
 ```json
 {
     "require": {
-        "gordalina/mixpanel-bundle": "~3.0"
+        "gordalina/mixpanel-bundle": "~5.0"
     }
 }
 ```

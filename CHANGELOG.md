@@ -4,8 +4,7 @@
 
 ### Breaking Changes
 
-- Dropped support for PHP `<8.0`
-- Dropped support for Symfony `<5.4`
+- Dropped support for PHP `<8.0` & Symfony `<5.4` [#30](https://github.com/gordalina/GordalinaMixpanelBundle/pull/30)
 
 ## [v4.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/4.0.0)
 
