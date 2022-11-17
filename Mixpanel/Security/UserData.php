@@ -136,6 +136,8 @@ class UserData
 
             return $this->properties[$className];
         }
+        
+        return [];
     }
 
     /**
