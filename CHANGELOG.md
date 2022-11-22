@@ -1,3 +1,11 @@
+## [v5.0.1](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.0.1)
+
+[5.0.0...5.0.1](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.0.0...5.0.1)
+
+### Fixes
+
+- `getUserProperties()` returns null if instance is a doctrine proxy [#32](https://github.com/gordalina/GordalinaMixpanelBundle/pull/32)
+
 ## [v5.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.0.0)
 
 [4.0.0...5.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/4.0.0...5.0.0)
