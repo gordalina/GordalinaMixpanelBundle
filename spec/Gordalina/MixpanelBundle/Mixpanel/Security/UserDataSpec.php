@@ -8,6 +8,7 @@ use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
 use PhpSpec\ObjectBehavior;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserDataSpec extends ObjectBehavior
 {
@@ -25,11 +26,55 @@ class UserDataSpec extends ObjectBehavior
         TokenStorageInterface $tokenStorage,
         TokenInterface $token
     ) {
+        $token->getUser()->willReturn(null);
 
         $tokenStorage->getToken()->willReturn($token);
 
-        $token->getUser()->willReturn(null);
-
         $this->getProperties()->shouldReturn([]);
     }
+
+    public function it_should_return_properties_for_proxies(
+        TokenStorageInterface $tokenStorage,
+        TokenInterface $token,
+        ManagerRegistry $registry
+    ) {
+        $registry->getUsers()->willReturn([TestUser::class => [
+            'id' => 'id',
+        ]]);
+
+        $user = new TestUserProxy();
+
+        $token->getUser()->willReturn($user);
+
+        $tokenStorage->getToken()->willReturn($token);
+
+        $this->getProperties()->shouldReturn(['id' => '1']);
+    }
+}
+
+class TestUser implements UserInterface
+{
+    public function getRoles(): array
+    {
+        return [];
+    }
+
+    public function eraseCredentials(): void
+    {
+        return;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return '1';
+    }
+
+    public function getId(): string
+    {
+        return $this->getUserIdentifier();
+    }
+}
+
+class TestUserProxy extends TestUser
+{
 }
