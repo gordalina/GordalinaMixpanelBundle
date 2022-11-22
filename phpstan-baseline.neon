@@ -9,8 +9,3 @@ parameters:
 			message: "#^Casting to bool something that's already bool\\.$#"
 			count: 8
 			path: Mixpanel/EventListener/MixpanelListener.php
-
-		-
-			message: "#^Method Gordalina\\\\MixpanelBundle\\\\Mixpanel\\\\Security\\\\UserData\\:\\:getProperties\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: Mixpanel/Security/UserData.php
