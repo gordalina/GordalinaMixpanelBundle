@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Gordalina\MixpanelBundle\Mixpanel\Mixpanel;
 
 use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
-use Mixpanel;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 class Flusher
@@ -115,7 +114,7 @@ class Flusher
     /**
      * This is quite a hack, but gets the job done.
      */
-    private function getQueue(Mixpanel $project, string $propertyName, bool $isAccessible): array
+    private function getQueue(\Mixpanel $project, string $propertyName, bool $isAccessible): array
     {
         $rfl      = new \ReflectionClass($project);
         $property = $rfl->getProperty($propertyName);
