@@ -105,7 +105,7 @@ class UserData
         }
 
         foreach ($this->registry->getUsers() as $class => $properties) {
-            if ($className !== $class) {
+            if (!is_a($className, $class, true)) {
                 continue;
             }
 
