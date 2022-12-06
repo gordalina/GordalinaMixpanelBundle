@@ -1,3 +1,11 @@
+## [v5.0.2](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.0.2)
+
+[5.0.1...5.0.2](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.0.1...5.0.2)
+
+### Fixes
+
+- Registry does not match doctrine proxies [#33](https://github.com/gordalina/GordalinaMixpanelBundle/pull/33)
+
 ## [v5.0.1](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.0.1)
 
 [5.0.0...5.0.1](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.0.0...5.0.1)
