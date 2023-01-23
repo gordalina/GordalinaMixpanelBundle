@@ -1,3 +1,11 @@
+## [v5.0.3](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.0.3)
+
+[5.0.2...5.0.3](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.0.2...5.0.3)
+
+### Fixes
+
+- Don't send DateTimeInterface as value for properties in extra_data [#36](https://github.com/gordalina/GordalinaMixpanelBundle/pull/36)
+
 ## [v5.0.2](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.0.2)
 
 [5.0.1...5.0.2](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.0.1...5.0.2)
