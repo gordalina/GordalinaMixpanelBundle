@@ -50,6 +50,27 @@ class UserDataSpec extends ObjectBehavior
 
         $this->getProperties()->shouldReturn(['id' => '1']);
     }
+
+    public function it_should_format_date_time_objects(
+        TokenStorageInterface $tokenStorage,
+        TokenInterface $token,
+        ManagerRegistry $registry
+    ) {
+        $registry->getUsers()->willReturn([TestUser::class => [
+            'id' => 'id',
+            'extra_data' => [
+                ['key' => 'created_at', 'value' => 'createdAt']
+            ],
+        ]]);
+
+        $user = new TestUser();
+
+        $token->getUser()->willReturn($user);
+
+        $tokenStorage->getToken()->willReturn($token);
+
+        $this->getProperties()->shouldReturn(['id' => '1', 'created_at' => '2020-01-01T00:00:00+00:00']);
+    }
 }
 
 class TestUser implements UserInterface
@@ -72,6 +93,11 @@ class TestUser implements UserInterface
     public function getId(): string
     {
         return $this->getUserIdentifier();
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('2020-01-01');
     }
 }
 

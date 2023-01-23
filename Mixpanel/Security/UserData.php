@@ -123,7 +123,13 @@ class UserData
 
                 foreach ($prop as $element) {
                     try {
-                        $this->properties[$className][$element['key']] = $this->accessor->getValue($instance, $element['value']);
+                        $value = $this->accessor->getValue($instance, $element['value']);
+
+                        if ($value instanceof \DateTimeInterface) {
+                            $value = $value->format(DATE_ATOM);
+                        }
+
+                        $this->properties[$className][$element['key']] = $value;
                     } catch (\Exception $e) {
                         if ($this->displayErrors) {
                             throw $e;
