@@ -28,9 +28,9 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -256 }
 
-    Gordalina\MixpanelBundle\Mixpanel\EventListener\FinishRequestListener:
+    Gordalina\MixpanelBundle\Mixpanel\EventListener\TerminateListener:
         tags:
-            - { name: kernel.event_listener, event: kernel.finish_request, method: onFinishRequest, priority: -99 }
+            - { name: kernel.event_listener, event: kernel.terminate, method: onTerminate, priority: -99 }
 
     Gordalina\MixpanelBundle\Mixpanel\DataCollector\MixpanelDataCollector:
         tags:
