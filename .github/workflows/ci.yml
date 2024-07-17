@@ -82,15 +82,15 @@ jobs:
         symfony-version: ["5.4", "6.4", "7.1"]
         include:
           # minimum versions
-          - php-version: 8.0
+          - php-version: "8.0"
             operating-system: ubuntu-22.04
-            symfoy-version: "5.4"
-          - php-version: 8.0
+            symfony-version: "5.4"
+          - php-version: "8.0"
             operating-system: ubuntu-22.04
-            symfoy-version: "6.4"
-          - php-version: 8.3
+            symfony-version: "6.4"
+          - php-version: "8.3"
             operating-system: macos-12
-            symfoy-version: "7.1"
+            symfony-version: "7.1"
     name: test php/${{ matrix.php-version }} symfony/${{ matrix.symfony-version }} on ${{ matrix.operating-system }}
     steps:
       - name: Checkout
