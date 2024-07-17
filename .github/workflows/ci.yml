@@ -90,7 +90,7 @@ jobs:
             symfony-version: "6.4"
           # macos
           - php-version: "8.3"
-            operating-system: macos-12
+            operating-system: macos-14
             symfony-version: "7.1"
     name: "${{ matrix.operating-system }}: php/${{ matrix.php-version }} symfony/${{ matrix.symfony-version }}"
     steps:
