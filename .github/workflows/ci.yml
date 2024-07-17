@@ -92,7 +92,7 @@ jobs:
           - php-version: "8.3"
             operating-system: macos-12
             symfony-version: "7.1"
-    name: test php/${{ matrix.php-version }} symfony/${{ matrix.symfony-version }} on ${{ matrix.operating-system }}
+    name: "${{ matrix.operating-system }}: php/${{ matrix.php-version }} symfony/${{ matrix.symfony-version }}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
