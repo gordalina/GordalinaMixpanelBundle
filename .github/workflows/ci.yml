@@ -81,13 +81,14 @@ jobs:
         php-version: ["8.3"]
         symfony-version: ["5.4", "6.4", "7.1"]
         include:
-          # minimum versions
+          # all supported symfony versions
           - php-version: "8.0"
             operating-system: ubuntu-22.04
             symfony-version: "5.4"
-          - php-version: "8.0"
+          - php-version: "8.1"
             operating-system: ubuntu-22.04
             symfony-version: "6.4"
+          # macos
           - php-version: "8.3"
             operating-system: macos-12
             symfony-version: "7.1"
