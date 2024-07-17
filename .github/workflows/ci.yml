@@ -11,7 +11,7 @@ on:
       - "*"
 
 jobs:
-  lint:
+  php-cs-fixer:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -41,14 +41,44 @@ jobs:
       - name: Run php-cs-fixer
         run: bin/php-cs-fixer fix --verbose --diff --dry-run Mixpanel/
 
+  php-stan:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: 8.0
+          extensions: mbstring, pcov
+          coverage: pcov
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Run PHPStan
+        run: bin/phpstan
+
   test:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       max-parallel: 15
       matrix:
         operating-system: [ubuntu-20.04, macOS-10.15]
-        php-versions: ["8.0", "8.1", "8.2", "8.3"]
-        symfony-versions: ["5.4", "6.4"]
+        php-versions: ["8.0", "8.3"]
+        symfony-versions: ["5.4", "6.4", "7.1"]
     name: Test Symfony ${{ matrix.symfony-versions }} with PHP ${{ matrix.php-versions }} on ${{ matrix.operating-system }}
     steps:
       - name: Checkout
@@ -91,9 +121,3 @@ jobs:
 
       - name: Run phpspec
         run: bin/phpspec run -f dot -n
-
-      - name: Run php-cs-fixer
-        run: bin/php-cs-fixer fix --verbose --diff --dry-run Mixpanel/
-
-      - name: Run PHPStan
-        run: bin/phpstan
