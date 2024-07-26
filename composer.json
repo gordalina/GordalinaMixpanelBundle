@@ -16,14 +16,14 @@
     ],
     "require": {
         "php": "^8.0",
-        "symfony/framework-bundle": "^5.4 || ^6.0",
-        "symfony/expression-language": "^5.4 || ^6.0",
-        "symfony/security-http": "^5.4 || ^6.0",
+        "symfony/framework-bundle": "^5.4 || ^6.0 || ^7.0",
+        "symfony/expression-language": "^5.4 || ^6.0 || ^7.0",
+        "symfony/security-http": "^5.4 || ^6.0 || ^7.0",
         "symfony/http-kernel": "^5.4 || ^6.0",
         "mixpanel/mixpanel-php": "~2.8"
     },
     "require-dev": {
-        "phpspec/phpspec": "^7.2",
+        "phpspec/phpspec": "^7.5",
         "friendsofphp/php-cs-fixer": "^3.8",
         "phpstan/phpstan": "^1.6",
         "phpstan/phpstan-symfony": "^1.1",
