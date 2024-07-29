@@ -24,7 +24,7 @@
     },
     "require-dev": {
         "phpspec/phpspec": "^7.5",
-        "friendsofphp/php-cs-fixer": "^3.8",
+        "friendsofphp/php-cs-fixer": "^3.60",
         "phpstan/phpstan": "^1.6",
         "phpstan/phpstan-symfony": "^1.1",
         "phpstan/phpstan-strict-rules": "^1.2"
