@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace Gordalina\MixpanelBundle\Mixpanel\EventListener;
 
 use Gordalina\MixpanelBundle\Mixpanel\Mixpanel\Flusher;
-use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
-class FinishRequestListener
+class TerminateListener
 {
     /**
      * @var Flusher
@@ -28,7 +28,7 @@ class FinishRequestListener
         $this->flusher = $flusher;
     }
 
-    public function onFinishRequest(FinishRequestEvent $e)
+    public function onTerminate(TerminateEvent $e)
     {
         $this->flusher->flush();
     }
