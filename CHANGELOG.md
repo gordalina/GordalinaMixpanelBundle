@@ -1,3 +1,11 @@
+## [v5.1.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.1.0)
+
+[5.0.3...5.1.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.0.3...5.1.0)
+
+### Changes
+
+- Register flusher listener on kernel.terminate instead of kernel.finish_request [#39](https://github.com/gordalina/GordalinaMixpanelBundle/pull/39)
+
 ## [v5.0.3](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.0.3)
 
 [5.0.2...5.0.3](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.0.2...5.0.3)
