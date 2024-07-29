@@ -27,7 +27,8 @@
         "friendsofphp/php-cs-fixer": "^3.60",
         "phpstan/phpstan": "^1.6",
         "phpstan/phpstan-symfony": "^1.1",
-        "phpstan/phpstan-strict-rules": "^1.2"
+        "phpstan/phpstan-strict-rules": "^1.2",
+        "doctrine/annotations": "^2.0"
     },
     "autoload": {
         "psr-4": {
