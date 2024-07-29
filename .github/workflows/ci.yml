@@ -11,23 +11,96 @@ on:
       - "*"
 
 jobs:
+  php-cs-fixer:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: 8.0
+          extensions: mbstring, pcov
+          coverage: pcov
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "COMPOSER_CACHE_FILES_DIR=$(composer config cache-files-dir)" >> $GITHUB_ENV
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.COMPOSER_CACHE_FILES_DIR }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Run php-cs-fixer
+        run: bin/php-cs-fixer fix --verbose --diff --dry-run Mixpanel/
+
+  php-stan:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@master
+        with:
+          php-version: 8.0
+          extensions: mbstring, pcov
+          coverage: pcov
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "COMPOSER_CACHE_FILES_DIR=$(composer config cache-files-dir)" >> $GITHUB_ENV
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.COMPOSER_CACHE_FILES_DIR }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
+
+      - name: Install Dependencies
+        run: composer install --prefer-dist --no-interaction
+
+      - name: Run PHPStan
+        run: bin/phpstan
+
   test:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       max-parallel: 15
       matrix:
-        operating-system: [ubuntu-20.04, macOS-10.15]
-        php-versions: ["8.0", "8.1"]
-        symfony-versions: ["5.4", "6.0"]
-    name: Test Symfony ${{ matrix.symfony-versions }} with PHP ${{ matrix.php-versions }} on ${{ matrix.operating-system }}
+        # latest php on all symfony versions
+        operating-system: [ubuntu-22.04]
+        php-version: ["8.3"]
+        symfony-version: ["5.4", "6.4", "7.1"]
+        include:
+          # all supported symfony versions
+          - php-version: "8.0"
+            operating-system: ubuntu-22.04
+            symfony-version: "5.4"
+          - php-version: "8.1"
+            operating-system: ubuntu-22.04
+            symfony-version: "6.4"
+          # macos
+          - php-version: "8.3"
+            operating-system: macos-14
+            symfony-version: "7.1"
+    name: "${{ matrix.operating-system }}: php/${{ matrix.php-version }} symfony/${{ matrix.symfony-version }}"
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@master
+        uses: shivammathur/setup-php@main
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php-version }}
           extensions: mbstring, pcov
           coverage: pcov
 
@@ -42,28 +115,22 @@ jobs:
 
       - name: Get Composer Cache Directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "COMPOSER_CACHE_FILES_DIR=$(composer config cache-files-dir)" >> $GITHUB_ENV
 
       - name: Cache dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
+          path: ${{ env.COMPOSER_CACHE_FILES_DIR }}
           key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
           restore-keys: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
 
       - name: Set Symfony version
         run: |
           composer update --prefer-dist --no-interaction
-          composer config extra.symfony.require ${{ matrix.symfony-versions }}
+          composer config extra.symfony.require ${{ matrix.symfony-version }}
 
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction
 
       - name: Run phpspec
         run: bin/phpspec run -f dot -n
-
-      - name: Run php-cs-fixer
-        run: bin/php-cs-fixer fix --verbose --diff --dry-run Mixpanel/
-
-      - name: Run PHPStan
-        run: bin/phpstan
