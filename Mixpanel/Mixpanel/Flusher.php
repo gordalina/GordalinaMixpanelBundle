@@ -43,7 +43,7 @@ class Flusher
      */
     private $enableProfiler;
 
-    public function __construct(ManagerRegistry $registry, Stopwatch $stopwatch = null, bool $enableProfiler = false)
+    public function __construct(ManagerRegistry $registry, ?Stopwatch $stopwatch = null, bool $enableProfiler = false)
     {
         $this->registry       = $registry;
         $this->stopwatch      = $stopwatch ?? new Stopwatch();

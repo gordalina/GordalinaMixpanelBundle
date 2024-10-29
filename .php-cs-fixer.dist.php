@@ -17,12 +17,12 @@ return $config
             'operators' => ['=>' => 'align', '=' => 'align']
         ],
         'no_unreachable_default_argument_value' => false,
-        'braces' => [
-            'allow_single_line_closure' => true,
-        ],
         'heredoc_to_nowdoc' => false,
         'phpdoc_summary' => false,
         'declare_strict_types' => true,
+        'no_superfluous_phpdoc_tags' => [
+            'allow_mixed' => true,
+        ],
     ])
     ->setFinder($finder)
 ;

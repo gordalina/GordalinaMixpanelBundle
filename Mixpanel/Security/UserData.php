@@ -29,7 +29,7 @@ class UserData
      *
      * @var PropertyAccess
      */
-    private $accessor = null;
+    private $accessor;
 
     /**
      * @var TokenStorageInterface
