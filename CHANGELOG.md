@@ -1,4 +1,6 @@
-## v6.0.0 (unreleased)
+## [v6.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/6.0.0)
+
+[5.1.1...6.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.1.1...6.0.0)
 
 ### Breaking Changes
 
@@ -66,6 +68,14 @@ return RectorConfig::configure()
   bundle now registers its own (`gordalina_mixpanel.annotation_reader`) and
   depends on `doctrine/annotations` explicitly. Both the dependency and the
   annotation support will be removed in the next major version.
+
+## [v5.1.1](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.1.1)
+
+[5.1.0...5.1.1](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.1.0...5.1.1)
+
+### Fixes
+
+- Renamed `FinishRequestListener.php` to `TerminateListener.php` so the file name matches the `TerminateListener` class it declares, which PSR-4 autoloading requires [#41](https://github.com/gordalina/GordalinaMixpanelBundle/pull/41)
 
 ## [v5.1.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.1.0)
 
