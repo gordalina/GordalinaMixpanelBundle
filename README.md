@@ -17,6 +17,8 @@ into Symfony.
 - [MixpanelEvent](#mixpanelevent)
 - [Override Props in all Attributes](#override-props-in-all-attributes)
 - [Upgrading from Doctrine annotations](#upgrading-from-doctrine-annotations)
+    - [Automated migration with Rector](#automated-migration-with-rector)
+    - [Manual migration](#manual-migration)
 - [Symfony Profiler Integration](#symfony-profiler-integration)
 - [Reference Configuration](#reference-configuration)
 - [Spec](#spec)
@@ -330,7 +332,30 @@ be removed in the next major version. Symfony 7 no longer ships an
 (`gordalina_mixpanel.annotation_reader`) and depends on `doctrine/annotations`
 explicitly.
 
-Converting is mostly mechanical:
+#### Automated migration with Rector
+
+The bundle ships a [Rector](https://getrector.com) set that converts every Mixpanel
+annotation into its attribute form. Install Rector, then point it at your code:
+
+```php
+// rector.php
+declare(strict_types=1);
+
+use Gordalina\MixpanelBundle\Rector\MixpanelSetList;
+use Rector\Config\RectorConfig;
+
+return RectorConfig::configure()
+    ->withPaths([__DIR__.'/src'])
+    ->withSets([MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES]);
+```
+
+```sh
+$ vendor/bin/rector --dry-run   # review first
+$ vendor/bin/rector
+```
+
+Nested values are handled too — `@Mixpanel\Id` becomes `new Mixpanel\Id()` and
+`@Mixpanel\Expression("...")` becomes `new Mixpanel\Expression('...')`:
 
 ```php
 // before
@@ -338,15 +363,17 @@ Converting is mostly mechanical:
  * @Mixpanel\Track("Order Completed", props={
  *      "user_id": @Mixpanel\Expression("user.getId()")
  * })
+ * @Mixpanel\Set(id=@Mixpanel\Id, props={"plan": "pro"})
  */
 
 // after
-#[Mixpanel\Track('Order Completed', props: [
-    'user_id' => new Mixpanel\Expression('user.getId()'),
-])]
+#[Mixpanel\Track('Order Completed', props: ['user_id' => new Mixpanel\Expression('user.getId()')])]
+#[Mixpanel\Set(id: new Mixpanel\Id(), props: ['plan' => 'pro'])]
 ```
 
-Two things to watch out for:
+#### Manual migration
+
+If you'd rather convert by hand, two things to watch out for:
 
 - Nested actions such as `@Mixpanel\Id` or `@Mixpanel\Expression(...)` become real
   object instantiations: `new Mixpanel\Id()`, `new Mixpanel\Expression('...')`

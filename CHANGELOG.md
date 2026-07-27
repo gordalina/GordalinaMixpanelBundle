@@ -46,6 +46,18 @@ class CheckoutController
 
 - `Annotation\Append` now accepts any value type, matching its documented usage
   (`value: 'apples'`); it was previously restricted to integers
+- Added a Rector set to automate the annotation to attribute migration, including
+  nested `@Mixpanel\Id` / `@Mixpanel\Expression` values:
+
+```php
+// rector.php
+use Gordalina\MixpanelBundle\Rector\MixpanelSetList;
+use Rector\Config\RectorConfig;
+
+return RectorConfig::configure()
+    ->withPaths([__DIR__.'/src'])
+    ->withSets([MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES]);
+```
 
 ### Deprecations
 
