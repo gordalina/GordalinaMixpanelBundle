@@ -15,23 +15,20 @@ namespace Gordalina\MixpanelBundle\Annotation;
 
 /**
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target({"CLASS", "METHOD"})
  *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final class Register extends Annotation
 {
-    /**
-     * @Required
-     *
-     * @var string
-     */
-    public $prop;
-
-    /**
-     * @Required
-     *
-     * @var mixed
-     */
-    public $value;
+    public function __construct(
+        public string $prop,
+        public mixed $value,
+        ?string $project = null,
+        string|bool|null $condition = null,
+    ) {
+        parent::__construct($project, $condition);
+    }
 }

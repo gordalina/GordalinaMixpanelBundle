@@ -15,21 +15,23 @@ namespace Gordalina\MixpanelBundle\Annotation;
 
 /**
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target({"CLASS", "METHOD"})
  *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final class Track extends Annotation
 {
     /**
-     * @Required
-     *
-     * @var mixed
+     * @param array<string, mixed> $props
      */
-    public $event;
-
-    /**
-     * @var array
-     */
-    public $props;
+    public function __construct(
+        public mixed $event,
+        public array $props = [],
+        ?string $project = null,
+        string|bool|null $condition = null,
+    ) {
+        parent::__construct($project, $condition);
+    }
 }

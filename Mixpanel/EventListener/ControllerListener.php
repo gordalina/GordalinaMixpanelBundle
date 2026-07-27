@@ -25,61 +25,85 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class ControllerListener
 {
-    /**
-     * @var Reader
-     */
-    private $annotationReader;
+    private ExpressionLanguage $expressionLanguage;
 
     /**
-     * @var UserData
+     * @param Reader|null $annotationReader Reading Doctrine annotations is deprecated, use PHP attributes instead
      */
-    private $userData;
-
-    /**
-     * @var ExpressionLanguage
-     */
-    private $expressionLanguage;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    public function __construct(Reader $annotationReader, UserData $userData, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->annotationReader   = $annotationReader;
-        $this->userData           = $userData;
+    public function __construct(
+        private UserData $userData,
+        private EventDispatcherInterface $eventDispatcher,
+        private ?Reader $annotationReader = null,
+    ) {
         $this->expressionLanguage = new ExpressionLanguage();
-        $this->eventDispatcher    = $eventDispatcher;
     }
 
-    public function onKernelController(ControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
-        if (!is_array($controller = $event->getController())) {
-            return;
+        $request = $event->getRequest();
+
+        foreach ($this->getAnnotations($event) as $annotation) {
+            if (!$this->isConditionMet($annotation, $request)) {
+                continue;
+            }
+
+            $this->prepareAnnotation($annotation, $request);
+            $this->eventDispatcher->dispatch(new MixpanelEvent($annotation, $request));
+        }
+    }
+
+    /**
+     * @return list<Annotation\Annotation>
+     */
+    private function getAnnotations(ControllerEvent $event): array
+    {
+        $annotations = [];
+
+        foreach ($event->getAttributes() as $attributes) {
+            foreach ($attributes as $attribute) {
+                if ($attribute instanceof Annotation\Annotation) {
+                    $annotations[] = $attribute;
+                }
+            }
+        }
+
+        return array_merge($annotations, $this->getDoctrineAnnotations($event));
+    }
+
+    /**
+     * BC layer for controllers still using Doctrine annotations.
+     *
+     * @return list<Annotation\Annotation>
+     */
+    private function getDoctrineAnnotations(ControllerEvent $event): array
+    {
+        if (null === $this->annotationReader || !is_array($controller = $event->getController())) {
+            return [];
         }
 
         $className = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($controller[0]) : get_class($controller[0]);
         $object    = new \ReflectionClass($className);
         $method    = $object->getMethod($controller[1]);
 
-        $classAnnotations  = $this->annotationReader->getClassAnnotations($object);
-        $methodAnnotations = $this->annotationReader->getMethodAnnotations($method);
+        $collections = [
+            $this->annotationReader->getClassAnnotations($object),
+            $this->annotationReader->getMethodAnnotations($method),
+        ];
 
-        foreach ([$classAnnotations, $methodAnnotations] as $collection) {
+        $annotations = [];
+
+        foreach ($collections as $collection) {
             foreach ($collection as $annotation) {
                 if ($annotation instanceof Annotation\Annotation) {
-                    $this->handleCondition($annotation, $event->getRequest());
-                    if (true === $annotation->condition) {
-                        $this->prepareAnnotation($annotation, $event->getRequest());
-                        $this->eventDispatcher->dispatch(new MixpanelEvent($annotation, $event->getRequest()));
-                    }
+                    $annotations[] = $annotation;
                 }
             }
         }
+
+        return $annotations;
     }
 
-    private function prepareAnnotation(Annotation\Annotation $annotation, Request $request)
+    private function prepareAnnotation(Annotation\Annotation $annotation, Request $request): void
     {
         foreach ($annotation as $key => $value) {
             if (is_array($value)) {
@@ -93,18 +117,22 @@ class ControllerListener
         }
     }
 
-    private function handleCondition(Annotation\Annotation $annotation, Request $request)
+    private function isConditionMet(Annotation\Annotation $annotation, Request $request): bool
     {
-        $value = $annotation->condition;
+        $condition = $annotation->condition;
 
-        if (null !== $value) {
-            $annotation->condition = $this->expressionLanguage->evaluate($value, array_merge(['request' => $request], $request->attributes->all()));
-        } else {
-            $annotation->condition = true;
+        if (null === $condition) {
+            return true;
         }
+
+        if (is_bool($condition)) {
+            return $condition;
+        }
+
+        return true === $this->expressionLanguage->evaluate($condition, array_merge(['request' => $request], $request->attributes->all()));
     }
 
-    private function updateDataAnnotation(Annotation\Annotation $annotation, Request $request, string $key, $value, ?string $parentKey = null)
+    private function updateDataAnnotation(Annotation\Annotation $annotation, Request $request, string $key, mixed $value, ?string $parentKey = null): void
     {
         $element = null;
 

@@ -62,17 +62,17 @@ class AuthenticationListener
         $this->sendDataToMixpanel = $sendDataToMixpanel;
     }
 
-    public function onAuthenticationSuccess(AuthenticationEvent $e)
+    public function onAuthenticationSuccess(AuthenticationEvent $e): void
     {
         $this->authentication->onAuthenticationSuccess($e->getAuthenticationToken());
     }
 
-    public function onAuthenticationFailure(LoginFailureEvent $e)
+    public function onAuthenticationFailure(LoginFailureEvent $e): void
     {
         $this->authentication->onAuthenticationFailure();
     }
 
-    public function onInteractiveLogin(InteractiveLoginEvent $e)
+    public function onInteractiveLogin(InteractiveLoginEvent $e): void
     {
         $this->authentication->onAuthenticationSuccess($e->getAuthenticationToken());
     }
@@ -82,7 +82,7 @@ class AuthenticationListener
         $this->authentication->onAuthenticationSuccess($event->getAuthenticatedToken());
     }
 
-    public function onKernelRequest(RequestEvent $e)
+    public function onKernelRequest(RequestEvent $e): void
     {
         $token = $this->tokenStorage->getToken();
 
@@ -97,7 +97,7 @@ class AuthenticationListener
         }
     }
 
-    public function onSwitchUser(SwitchUserEvent $e)
+    public function onSwitchUser(SwitchUserEvent $e): void
     {
         $this->authentication->onAuthenticationFailure();
 

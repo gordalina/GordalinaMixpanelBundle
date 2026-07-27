@@ -15,26 +15,24 @@ namespace Gordalina\MixpanelBundle\Annotation;
 
 /**
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target({"CLASS", "METHOD"})
  *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final class Remove extends Annotation
 {
     /**
-     * @var mixed
+     * @param array<string, mixed> $props
      */
-    public $id;
-
-    /**
-     * @Required
-     *
-     * @var array
-     */
-    public $props;
-
-    /**
-     * @var bool
-     */
-    public $ignoreTime;
+    public function __construct(
+        public array $props,
+        public mixed $id = null,
+        public bool $ignoreTime = false,
+        ?string $project = null,
+        string|bool|null $condition = null,
+    ) {
+        parent::__construct($project, $condition);
+    }
 }

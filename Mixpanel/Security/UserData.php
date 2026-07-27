@@ -29,7 +29,7 @@ class UserData
      *
      * @var PropertyAccess
      */
-    private $accessor = null;
+    private $accessor;
 
     /**
      * @var TokenStorageInterface
@@ -55,8 +55,6 @@ class UserData
 
     /**
      * @param object $instance
-     *
-     * @return mixed
      */
     public function getId($instance = null)
     {
@@ -68,8 +66,6 @@ class UserData
     /**
      * @param object $instance
      * @param string $property id|'$first_name'|'$last_name'|'$email'|'$phone'
-     *
-     * @return mixed
      */
     public function getProperty($instance, $property = null)
     {

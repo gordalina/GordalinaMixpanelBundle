@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\DependencyInjection;
 
-use Symfony\Component\Config\Definition\BaseNode;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -24,23 +24,11 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * @var bool
-     */
-    private $debug;
-
-    /**
-     * @param bool $debug
-     */
-    public function __construct($debug)
+    public function __construct(private bool $debug)
     {
-        $this->debug = $debug;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('gordalina_mixpanel');
         $rootNode    = $treeBuilder->getRootNode();
@@ -56,7 +44,7 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(true)
                 ->end()
                 ->booleanNode('auto_update_user')
-                    ->info('Send data user on each master request (useful if you do not force users to disconnect when setting up the bundle or add new properties in their profile. WARNING: preferred used @Mixpanel\UpdateUser() or @Mixpanel\Set() at connection for performances)')
+                    ->info('Send data user on each main request (useful if you do not force users to disconnect when setting up the bundle or add new properties in their profile. WARNING: prefer #[Mixpanel\UpdateUser] or #[Mixpanel\Set] at connection for performances)')
                     ->defaultValue($this->debug)
                 ->end()
                 ->booleanNode('throw_on_user_data_attribute_failure')
@@ -130,7 +118,7 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    public function addMixpanelOptionsNode()
+    public function addMixpanelOptionsNode(): NodeDefinition
     {
         $treeBuilder = new TreeBuilder('options');
         $rootNode    = $treeBuilder->getRootNode();

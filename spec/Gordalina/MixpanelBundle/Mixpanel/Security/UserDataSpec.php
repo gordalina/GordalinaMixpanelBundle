@@ -24,7 +24,7 @@ class UserDataSpec extends ObjectBehavior
 
     public function it_should_return_empty_properties_when_user_is_anonymous(
         TokenStorageInterface $tokenStorage,
-        TokenInterface $token
+        TokenInterface $token,
     ) {
         $token->getUser()->willReturn(null);
 
@@ -36,7 +36,7 @@ class UserDataSpec extends ObjectBehavior
     public function it_should_return_properties_for_proxies(
         TokenStorageInterface $tokenStorage,
         TokenInterface $token,
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
     ) {
         $registry->getUsers()->willReturn([TestUser::class => [
             'id' => 'id',
@@ -54,12 +54,12 @@ class UserDataSpec extends ObjectBehavior
     public function it_should_format_date_time_objects(
         TokenStorageInterface $tokenStorage,
         TokenInterface $token,
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
     ) {
         $registry->getUsers()->willReturn([TestUser::class => [
-            'id' => 'id',
+            'id'         => 'id',
             'extra_data' => [
-                ['key' => 'created_at', 'value' => 'createdAt']
+                ['key' => 'created_at', 'value' => 'createdAt'],
             ],
         ]]);
 
@@ -82,7 +82,6 @@ class TestUser implements UserInterface
 
     public function eraseCredentials(): void
     {
-        return;
     }
 
     public function getUserIdentifier(): string

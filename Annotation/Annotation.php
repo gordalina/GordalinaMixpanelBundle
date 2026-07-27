@@ -16,17 +16,17 @@ namespace Gordalina\MixpanelBundle\Annotation;
 /**
  * Abstract Annotation
  *
+ * Concrete children are usable both as PHP attributes and, for backwards
+ * compatibility, as Doctrine annotations. Doctrine annotation support is
+ * deprecated and will be removed in the next major version.
+ *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
 abstract class Annotation
 {
-    /**
-     * @var string
-     */
-    public $project;
-
-    /**
-     * @var string
-     */
-    public $condition;
+    public function __construct(
+        public ?string $project = null,
+        public string|bool|null $condition = null,
+    ) {
+    }
 }

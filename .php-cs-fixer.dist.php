@@ -17,8 +17,8 @@ return $config
             'operators' => ['=>' => 'align', '=' => 'align']
         ],
         'no_unreachable_default_argument_value' => false,
-        'braces' => [
-            'allow_single_line_closure' => true,
+        'braces_position' => [
+            'allow_single_line_anonymous_functions' => true,
         ],
         'heredoc_to_nowdoc' => false,
         'phpdoc_summary' => false,

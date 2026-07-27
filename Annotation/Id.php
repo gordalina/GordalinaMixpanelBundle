@@ -14,6 +14,11 @@ declare(strict_types=1);
 namespace Gordalina\MixpanelBundle\Annotation;
 
 /**
+ * Placeholder resolved to the current user's distinct id.
+ *
+ * Used as a value of another attribute, e.g.
+ * #[Set(props: ['plan' => 'pro'], id: new Id())]
+ *
  * @Annotation
  * @Target("ANNOTATION")
  *

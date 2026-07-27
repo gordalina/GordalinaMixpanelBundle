@@ -15,10 +15,12 @@ namespace Gordalina\MixpanelBundle\Annotation;
 
 /**
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target({"CLASS", "METHOD"})
  *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final class UpdateUser extends Annotation
 {
 }

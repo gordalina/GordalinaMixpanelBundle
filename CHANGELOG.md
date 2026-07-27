@@ -1,3 +1,60 @@
+## v6.0.0 (unreleased)
+
+### Breaking Changes
+
+- Added support for Symfony `^7.0`, dropped support for Symfony `<6.4` and PHP `<8.1`
+- Annotation classes now declare a constructor, so their required values must be
+  passed to it instead of being assigned afterwards. This affects code building
+  annotations by hand to dispatch a `MixpanelEvent`:
+
+```php
+// before
+$annotation = new Annotation\Track();
+$annotation->event = 'My event';
+$annotation->props = ['prop 1' => 'data 1'];
+
+// after
+$annotation = new Annotation\Track('My event', ['prop 1' => 'data 1']);
+```
+
+- `Annotation\Id` and `Annotation\Expression` are now instantiated explicitly
+  when used as a value of another action, e.g. `new Annotation\Expression('user.getId()')`
+- The `condition` property is no longer overwritten with the result of its own
+  evaluation; it keeps the expression it was given and is evaluated on each request
+- Symfony 7 no longer dispatches `security.authentication.failure`, so
+  `AuthenticationListener::onAuthenticationFailure()` is now wired to
+  `Symfony\Component\Security\Http\Event\LoginFailureEvent` (the signature it
+  already declared)
+
+### Features
+
+- Mixpanel actions can now be declared as PHP attributes, and are repeatable:
+
+```php
+use Gordalina\MixpanelBundle\Annotation as Mixpanel;
+
+class CheckoutController
+{
+    #[Mixpanel\Track('View Checkout')]
+    #[Mixpanel\Set(props: ['plan' => 'pro'], id: new Mixpanel\Id())]
+    public function view(Request $request)
+    {
+        // ...
+    }
+}
+```
+
+- `Annotation\Append` now accepts any value type, matching its documented usage
+  (`value: 'apples'`); it was previously restricted to integers
+
+### Deprecations
+
+- Declaring Mixpanel actions as Doctrine annotations is deprecated, use PHP
+  attributes instead. Symfony 7 removed its `annotation_reader` service, so the
+  bundle now registers its own (`gordalina_mixpanel.annotation_reader`) and
+  depends on `doctrine/annotations` explicitly. Both the dependency and the
+  annotation support will be removed in the next major version.
+
 ## [v5.1.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.1.0)
 
 [5.0.3...5.1.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.0.3...5.1.0)
