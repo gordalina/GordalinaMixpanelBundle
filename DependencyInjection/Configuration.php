@@ -62,7 +62,13 @@ class Configuration implements ConfigurationInterface
                             ->then(function ($v) {
                                 return ['id' => $v];
                             })
+                        ->end()
+                        ->beforeNormalization()
                             ->ifTrue(function ($keys) {
+                                if (!is_array($keys)) {
+                                    return false;
+                                }
+
                                 foreach ($keys as $key => $value) {
                                     if (isset($keys['$'.$key])) {
                                         return true;
@@ -75,21 +81,9 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->children()
                             ->scalarNode('id')->isRequired()->end()
-                            ->scalarNode('first_name')
-                                ->setDeprecated(...$this->getDeprecationParams('The "%node%" option at path "%path%" is deprecated. Use "$first_name" instead.'))
-                            ->end()
                             ->scalarNode('$first_name')->end()
-                            ->scalarNode('last_name')
-                                ->setDeprecated(...$this->getDeprecationParams('The "%node%" option at path "%path%" is deprecated. Use "$last_name" instead.'))
-                            ->end()
                             ->scalarNode('$last_name')->end()
-                            ->scalarNode('email')
-                                ->setDeprecated(...$this->getDeprecationParams('The "%node%" option at path "%path%" is deprecated. Use "$email" instead.'))
-                            ->end()
                             ->scalarNode('$email')->end()
-                            ->scalarNode('phone')
-                                ->setDeprecated(...$this->getDeprecationParams('The "%node%" option at path "%path%" is deprecated. Use "$phone" instead.'))
-                            ->end()
                             ->scalarNode('$phone')->end()
                             ->arrayNode('extra_data')
                                 ->info('Non-default properties in Mixpanel user profile')
@@ -167,17 +161,5 @@ class Configuration implements ConfigurationInterface
         ;
 
         return $rootNode;
-    }
-
-    /**
-     * @return array<int,string>
-     */
-    private function getDeprecationParams(string $message): array
-    {
-        return [
-            'gordalina/mixpanel-bundle',
-            '3.2',
-            $message,
-        ];
     }
 }

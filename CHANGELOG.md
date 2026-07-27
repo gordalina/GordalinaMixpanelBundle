@@ -27,6 +27,20 @@ $annotation = new Annotation\Track('My event', ['prop 1' => 'data 1']);
   `AuthenticationListener::onAuthenticationFailure()` is now wired to
   `Symfony\Component\Security\Http\Event\LoginFailureEvent` (the signature it
   already declared)
+- Removed the `first_name`, `last_name`, `email` and `phone` user options,
+  deprecated since 3.2. Prefix them with `$` to send Mixpanel reserved
+  properties:
+
+```yaml
+gordalina_mixpanel:
+    users:
+        App\Entity\User:
+            id: id
+            $first_name: firstName # was: first_name
+            $last_name: lastName   # was: last_name
+            $email: email          # was: email
+            $phone: phone          # was: phone
+```
 
 ### Features
 
@@ -60,6 +74,13 @@ return RectorConfig::configure()
     ->withPaths([__DIR__.'/src'])
     ->withSets([MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES]);
 ```
+
+### Fixes
+
+- The `users` shorthand syntax (`App\Entity\User: id`) now works. Two `ifTrue()`
+  calls shared a single expression builder, so the second silently replaced the
+  first: the shorthand was never normalised and the duplicate-property check
+  raised a PHP warning on it instead
 
 ### Deprecations
 
