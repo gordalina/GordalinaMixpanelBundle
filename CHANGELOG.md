@@ -75,6 +75,31 @@ return RectorConfig::configure()
     ->withSets([MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES]);
 ```
 
+- Listeners that enrich a Mixpanel annotation before this bundle reads it must be
+  rewritten against `ControllerEvent::getAttributes()`. A cached annotation reader
+  returns the same annotation instances on every call, which is what made the
+  reader-based pattern work; a reader never sees PHP attributes, so once a
+  controller is migrated such a listener silently enriches nothing and events are
+  sent without the added properties:
+
+```php
+// before — only ever saw Doctrine annotations
+foreach ($this->annotationReader->getMethodAnnotations($method) as $annotation) {
+    if (property_exists($annotation, 'props')) {
+        $annotation->props['user_id'] = $this->security->getUser()->getId();
+    }
+}
+
+// after — sees attributes, and the instances this bundle dispatches
+foreach ($event->getAttributes() as $attributes) {
+    foreach ($attributes as $attribute) {
+        if ($attribute instanceof Annotation\Annotation && property_exists($attribute, 'props')) {
+            $attribute->props['user_id'] = $this->security->getUser()->getId();
+        }
+    }
+}
+```
+
 ### Fixes
 
 - The `users` shorthand syntax (`App\Entity\User: id`) now works. Two `ifTrue()`
@@ -89,6 +114,12 @@ return RectorConfig::configure()
   bundle now registers its own (`gordalina_mixpanel.annotation_reader`) and
   depends on `doctrine/annotations` explicitly. Both the dependency and the
   annotation support will be removed in the next major version.
+
+  On Symfony 6.4 the bundle keeps reusing the framework's `annotation_reader`,
+  and on Symfony 7 it aliases `Doctrine\Common\Annotations\Reader` to its own,
+  so the reader stays shared with the rest of the application. Registering a
+  private reader would have made annotations enriched elsewhere invisible to
+  this bundle.
 
 ## [v5.1.1](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.1.1)
 

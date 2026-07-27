@@ -324,6 +324,11 @@ services:
 own listener runs at. `ControllerEvent::getAttributes()` returns the very instances
 the bundle will read, so mutating them here is enough.
 
+**Upgrading**: if such a listener previously used a `Doctrine\Common\Annotations\Reader`
+to reach the annotations, it must be rewritten as above. A reader never sees PHP
+attributes, so the moment a controller is migrated the listener stops enriching
+anything — silently, with the events still being sent without the added properties.
+
 ### Upgrading from Doctrine annotations
 
 Doctrine annotations still work in this version, but they are deprecated and will
@@ -379,6 +384,10 @@ If you'd rather convert by hand, two things to watch out for:
   object instantiations: `new Mixpanel\Id()`, `new Mixpanel\Expression('...')`
 - `@Mixpanel\Remove` takes a `props` array, not a `prop` scalar — the previous
   README documented this incorrectly
+- Any listener of your own that reads Mixpanel annotations through a
+  `Doctrine\Common\Annotations\Reader` must move to
+  [`ControllerEvent::getAttributes()`](#override-props-in-all-attributes) at the
+  same time, otherwise it stops seeing the migrated controllers without any error
 
 
 ### Symfony Profiler Integration
