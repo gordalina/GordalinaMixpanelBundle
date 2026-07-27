@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
-- Added support for Symfony `^7.0`, dropped support for Symfony `<6.4` and PHP `<8.1`
+- Added support for Symfony `^7.0`, dropped support for Symfony `<6.4` and PHP `<8.2`
 - Annotation classes now declare a constructor, so their required values must be
   passed to it instead of being assigned afterwards. This affects code building
   annotations by hand to dispatch a `MixpanelEvent`:
