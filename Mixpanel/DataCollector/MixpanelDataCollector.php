@@ -38,7 +38,7 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
         $this->flusher  = $flusher;
     }
 
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->data = [
             'mixpanel' => [],
@@ -49,7 +49,7 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
         ];
     }
 
-    public function lateCollect()
+    public function lateCollect(): void
     {
         // lets collect the time by flushing the queue
         // normally this is only done when kernel.finish_request event is dispatched
@@ -59,7 +59,7 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
         $this->data['time']     = $this->flusher->getTime();
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->data = [];
     }
@@ -180,10 +180,7 @@ class MixpanelDataCollector extends DataCollector implements LateDataCollectorIn
         return $this->data['time'];
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'mixpanel';
     }

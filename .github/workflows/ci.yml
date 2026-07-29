@@ -10,127 +10,98 @@ on:
     branches:
       - "*"
 
+permissions:
+  contents: read
+
 jobs:
-  php-cs-fixer:
-    runs-on: ubuntu-22.04
+  coding-standards:
+    name: coding standards
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@master
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
-          extensions: mbstring, pcov
-          coverage: pcov
+          php-version: "8.2"
+          extensions: mbstring
+          coverage: none
 
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: echo "COMPOSER_CACHE_FILES_DIR=$(composer config cache-files-dir)" >> $GITHUB_ENV
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
         with:
-          path: ${{ env.COMPOSER_CACHE_FILES_DIR }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
-
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-interaction
+          dependency-versions: highest
 
       - name: Run php-cs-fixer
-        run: bin/php-cs-fixer fix --verbose --diff --dry-run Mixpanel/
+        run: bin/php-cs-fixer fix --verbose --diff --dry-run
 
-  php-stan:
-    runs-on: ubuntu-22.04
+  static-analysis:
+    name: static analysis
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@master
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.0
-          extensions: mbstring, pcov
-          coverage: pcov
+          php-version: "8.2"
+          extensions: mbstring
+          coverage: none
 
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: echo "COMPOSER_CACHE_FILES_DIR=$(composer config cache-files-dir)" >> $GITHUB_ENV
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
         with:
-          path: ${{ env.COMPOSER_CACHE_FILES_DIR }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
-
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-interaction
+          dependency-versions: highest
 
       - name: Run PHPStan
         run: bin/phpstan
 
-  test:
-    runs-on: ${{ matrix.operating-system }}
+  tests:
+    name: "php ${{ matrix.php }} / symfony ${{ matrix.symfony }} / ${{ matrix.dependencies }} deps${{ matrix.os && ' / macos' || '' }}"
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     strategy:
-      max-parallel: 15
+      fail-fast: false
       matrix:
-        # latest php on all symfony versions
-        operating-system: [ubuntu-22.04]
-        php-version: ["8.3"]
-        symfony-version: ["5.4", "6.4", "7.1"]
+        php: ["8.2", "8.4"]
+        symfony: ["6.4", "7.4"]
+        dependencies: ["highest"]
         include:
-          # all supported symfony versions
-          - php-version: "8.0"
-            operating-system: ubuntu-22.04
-            symfony-version: "5.4"
-          - php-version: "8.1"
-            operating-system: ubuntu-22.04
-            symfony-version: "6.4"
-          # macos
-          - php-version: "8.3"
-            operating-system: macos-14
-            symfony-version: "7.1"
-    name: "${{ matrix.operating-system }}: php/${{ matrix.php-version }} symfony/${{ matrix.symfony-version }}"
+          - php: "8.2"
+            symfony: "6.4"
+            dependencies: "lowest"
+          - php: "8.4"
+            symfony: "7.4"
+            dependencies: "highest"
+            os: "macos-latest"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@main
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
-          extensions: mbstring, pcov
-          coverage: pcov
+          php-version: ${{ matrix.php }}
+          extensions: mbstring
+          coverage: none
 
-      - name: Check PHP Version
-        run: php -v
-
-      - name: Check Composer Version
-        run: composer -V
-
-      - name: Check PHP Extensions
-        run: php -m
-
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        run: echo "COMPOSER_CACHE_FILES_DIR=$(composer config cache-files-dir)" >> $GITHUB_ENV
-
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.COMPOSER_CACHE_FILES_DIR }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-${{ hashFiles('composer.json') }}
-
-      - name: Set Symfony version
+      - name: Restrict Symfony to ${{ matrix.symfony }}
+        env:
+          SYMFONY_VERSION: ${{ matrix.symfony }}
         run: |
-          composer update --prefer-dist --no-interaction
-          composer config extra.symfony.require ${{ matrix.symfony-version }}
+          composer require --no-update --no-interaction \
+            symfony/{framework-bundle,expression-language,security-http,http-kernel,property-access}:"^${SYMFONY_VERSION}"
+          composer require --no-update --no-interaction --dev \
+            symfony/stopwatch:"^${SYMFONY_VERSION}"
 
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-interaction
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: ${{ matrix.dependencies }}
+
+      - name: Report resolved versions
+        run: composer show --direct
 
       - name: Run phpspec
         run: bin/phpspec run -f dot -n

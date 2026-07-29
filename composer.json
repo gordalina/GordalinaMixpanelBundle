@@ -15,19 +15,22 @@
         }
     ],
     "require": {
-        "php": "^8.0",
-        "symfony/framework-bundle": "^5.4 || ^6.0",
-        "symfony/expression-language": "^5.4 || ^6.0",
-        "symfony/security-http": "^5.4 || ^6.0",
-        "symfony/http-kernel": "^5.4 || ^6.0",
-        "mixpanel/mixpanel-php": "~2.8"
+        "php": "^8.2",
+        "symfony/framework-bundle": "^6.4 || ^7.0",
+        "symfony/expression-language": "^6.4 || ^7.0",
+        "symfony/security-http": "^6.4 || ^7.0",
+        "symfony/http-kernel": "^6.4 || ^7.0",
+        "symfony/property-access": "^6.4 || ^7.0",
+        "mixpanel/mixpanel-php": "~2.8",
+        "doctrine/annotations": "^2.0"
     },
     "require-dev": {
-        "phpspec/phpspec": "^7.2",
-        "friendsofphp/php-cs-fixer": "^3.8",
-        "phpstan/phpstan": "^1.6",
-        "phpstan/phpstan-symfony": "^1.1",
-        "phpstan/phpstan-strict-rules": "^1.2"
+        "phpspec/phpspec": "^8.0",
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "symfony/stopwatch": "^6.4 || ^7.0"
     },
     "autoload": {
         "psr-4": {
@@ -39,7 +42,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.1-dev"
+            "dev-master": "6.0-dev"
         }
     }
 }

@@ -10,12 +10,15 @@ into Symfony.
 - [Usage](#usage)
 - [Killer Feature](#killer-feature)
 - [Sending people information to Mixpanel](#sending-people-information-to-mixpanel)
-- [Annotations](#annotations)
+- [Attributes](#attributes)
     - [Mixpanel Actions](#mixpanel-actions)
-    - [Custom Annotations](#custom-annotations)
+    - [Value Placeholders](#value-placeholders)
 - [Send an event based on a condition](#send-an-event-based-on-a-condition)
 - [MixpanelEvent](#mixpanelevent)
-- [Override Props in all Annotations](#override-props-in-all-annotations)
+- [Override Props in all Attributes](#override-props-in-all-attributes)
+- [Upgrading from Doctrine annotations](#upgrading-from-doctrine-annotations)
+    - [Automated migration with Rector](#automated-migration-with-rector)
+    - [Manual migration](#manual-migration)
 - [Symfony Profiler Integration](#symfony-profiler-integration)
 - [Reference Configuration](#reference-configuration)
 - [Spec](#spec)
@@ -27,7 +30,7 @@ Installation
 Require [`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle) using composer
 
 ```sh
-$ php composer.phar require gordalina/mixpanel-bundle:~5.0
+$ php composer.phar require gordalina/mixpanel-bundle:~6.0
 ```
 
 Or require
@@ -38,7 +41,7 @@ to your `composer.json` file:
 ```json
 {
     "require": {
-        "gordalina/mixpanel-bundle": "~5.0"
+        "gordalina/mixpanel-bundle": "~6.0"
     }
 }
 ```
@@ -54,10 +57,10 @@ Register the bundle in `config/bundles.php`:
 }
 ```
 
-Enable the bundle's configuration in `app/config/config.yml`:
+Enable the bundle's configuration in `config/packages/gordalina_mixpanel.yaml`:
 
 ``` yaml
-# app/config/config.yml
+# config/packages/gordalina_mixpanel.yaml
 
 gordalina_mixpanel:
     projects:
@@ -80,7 +83,7 @@ a reverse proxy in you servers you should set it in your front controller `publi
 Request::setTrustedProxies(
     // the IP address (or range) of your proxy
     ['192.0.0.1', '10.0.0.0/8'],
-    Request::HEADER_X_FORWARDED_ALL
+    Request::HEADER_X_FORWARDED_FOR | Request::HEADER_X_FORWARDED_HOST | Request::HEADER_X_FORWARDED_PORT | Request::HEADER_X_FORWARDED_PROTO
 );
 ```
 
@@ -88,7 +91,7 @@ You can find more documentation on Symfony website: [How to Configure Symfony to
 
 ### Killer Feature
 
-Track an event with a single annotation
+Track an event with a single attribute
 
 ```php
 <?php
@@ -98,9 +101,7 @@ use Gordalina\MixpanelBundle\Annotation as Mixpanel;
 
 class CheckoutController
 {
-    /**
-     * @Mixpanel\Track("View Checkout")
-     */
+    #[Mixpanel\Track('View Checkout')]
     public function view(Request $request)
     {
         // ...
@@ -110,7 +111,7 @@ class CheckoutController
 ### Sending people information to Mixpanel
 
 Mixpanel allows you to track your user's behaviours, but also some user information.
-When using annotations which require the [distinct_id](https://help.mixpanel.com/hc/en-us/articles/115004509406-What-is-distinct-id-),
+When using attributes which require the [distinct_id](https://help.mixpanel.com/hc/en-us/articles/115004509406-What-is-distinct-id-),
 this will be set automatically. This is done automatically provided you have configured it properly.
 You are able to override this value if you wish.
 
@@ -151,9 +152,7 @@ use Gordalina\MixpanelBundle\Annotation as Mixpanel;
 
 class UserController
 {
-    /**
-     * @Mixpanel\UpdateUser()
-     */
+    #[Mixpanel\UpdateUser]
     public function userUpdated(User $user, Request $request)
     {
         // ...
@@ -163,7 +162,7 @@ class UserController
 In the following example, we call UpdateUser, which sends all information registered
 in the configuration above, but we override the `id` property with an expression
 that evaluates the user id.
-The `@Expression` annotation uses [ExpressionLanguage](http://symfony.com/doc/current/components/expression_language/index.html)
+The `Expression` placeholder uses [ExpressionLanguage](http://symfony.com/doc/current/components/expression_language/index.html)
 for evaluation.
 
 ```php
@@ -174,15 +173,13 @@ use Gordalina\MixpanelBundle\Annotation as Mixpanel;
 
 class OrderController
 {
-    /**
-     * @Mixpanel\Track("Order Completed", props={
-     *      "user_id": @Mixpanel\Expression("user.getId()")
-     * })
-     * @Mixpanel\TrackCharge(
-     *      id=324"),
-     *      amount=@Mixpanel\Expression("order.getAmount()")
-     * )
-     */
+    #[Mixpanel\Track('Order Completed', props: [
+        'user_id' => new Mixpanel\Expression('user.getId()'),
+    ])]
+    #[Mixpanel\TrackCharge(
+        amount: new Mixpanel\Expression('order.getAmount()'),
+        id: 324,
+    )]
     public function orderCompleted(Order $order, Request $request)
     {
         // ...
@@ -190,43 +187,55 @@ class OrderController
 ```
 
 
-### Annotations
+### Attributes
+
+Every action below can be placed on a controller class or on a controller method,
+and can be repeated as many times as needed.
 
 #### Mixpanel Actions
 
 **Events**
-- `@Mixpanel\Register(prop="visits", value=3)`
-- `@Mixpanel\Track(event="name", props={ "firstTime": true })`
-- `@Mixpanel\Unregister(prop="$email")`
+- `#[Mixpanel\Register(prop: 'visits', value: 3)]`
+- `#[Mixpanel\Track(event: 'name', props: ['firstTime' => true])]`
+- `#[Mixpanel\Unregister(prop: '$email')]`
 
 **Engagement**
-- `@Mixpanel\Append(id=324, prop="fruits", value="apples" [, ignoreTime=false])`
-- `@Mixpanel\ClearCharges(id=324 [, ignoreTime=false])`
-- `@Mixpanel\DeleteUser(id=324 [, ignoreTime=false])`
-- `@Mixpanel\Increment(id=324, prop="visits", value=3 [, ignoreTime=false])`
-- `@Mixpanel\Remove(id=324, prop="$email")`
-- `@Mixpanel\Set(id=324, props={ "firstTime": true } [, ignoreTime=false])`
-- `@Mixpanel\SetOnce(id=324, props={ "firstTime": true } [, ignoreTime=false])`
-- `@Mixpanel\TrackCharge(id=697, amount="20.0" [, ignoreTime=false])`
+- `#[Mixpanel\Append(prop: 'fruits', value: 'apples' [, id: 324, ignoreTime: false])]`
+- `#[Mixpanel\ClearCharges([id: 324, ignoreTime: false])]`
+- `#[Mixpanel\DeleteUser([id: 324, ignoreTime: false])]`
+- `#[Mixpanel\Increment(prop: 'visits', value: 3 [, id: 324, ignoreTime: false])]`
+- `#[Mixpanel\Remove(props: ['$email' => 'a@b.com'] [, id: 324, ignoreTime: false])]`
+- `#[Mixpanel\Set(props: ['firstTime' => true] [, id: 324, ignoreTime: false])]`
+- `#[Mixpanel\SetOnce(props: ['firstTime' => true] [, id: 324, ignoreTime: false])]`
+- `#[Mixpanel\TrackCharge(amount: '20.0' [, id: 697, ignoreTime: false])]`
+- `#[Mixpanel\UpdateUser]`
 
-#### Custom Annotations
-- `@Mixpanel\Id()`
-- `@Mixpanel\Expression(expression="<expression>")`
-- `@Mixpanel\UpdateUser()`
+**Note**: Required arguments come first, so they can also be passed positionally,
+e.g. `#[Mixpanel\Track('name')]` or `#[Mixpanel\Set(['firstTime' => true])]`.
 
-**Note**: The first argument is not required to specify the name explicitly,
-e.g: `@Mixpanel\Expression("<expression>")` or `@Mixpanel\Set("<property>", value="<value>")`.
+**Note**: All `id` arguments can be omitted, as they will be set with the id of
+the currently authenticated user.
 
-**Note**: All `id` properties can be omitted, as they will be set with the id of
-the current user in `security.context`
+**Note**: Every action also accepts a `project` argument to target a project other
+than the default one.
+
+#### Value Placeholders
+
+These are not attributes, they are objects you pass as an argument value of an
+action and that get resolved at runtime:
+
+- `new Mixpanel\Id()` — the current user's distinct id
+- `new Mixpanel\Expression('<expression>')` — the result of an ExpressionLanguage expression
+
+```php
+#[Mixpanel\Set(props: ['plan' => 'pro'], id: new Mixpanel\Id())]
+```
 
 ### Send an event based on a condition
 
-In all annotations, you can add conditions with [Expression Language](https://symfony.com/doc/current/components/expression_language.html)
+In all attributes, you can add conditions with [Expression Language](https://symfony.com/doc/current/components/expression_language.html)
 ```php
-/**
-* @Mixpanel\Track("Your event", condition="request.getMethod() in ['GET']")
-*/
+#[Mixpanel\Track('Your event', condition: "request.getMethod() in ['GET']")]
 public function yourAction()
 {
   // ...
@@ -237,7 +246,7 @@ public function yourAction()
 
 ### MixpanelEvent
 
-You can also send an event through symfony events when the annotations are not sufficient like this:
+You can also send an event through symfony events when the attributes are not sufficient like this:
 ```php
 #In controller
 namespace myNamespace;
@@ -251,70 +260,49 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 public function edit(User $user, EventDispatcherInterface $eventDispatcher, Request $request)
 {
     // Your code
-    $annotation = new Annotation\Track();
-    $annotation->event = 'My event';
-    $annotation->props = [
+    $annotation = new Annotation\Track('My event', [
         'prop 1' => 'data 1',
         'prop 2' => 'data 2',
-    ];
+    ]);
 
     $eventDispatcher->dispatch(new MixpanelEvent($annotation, $request));
     // Rest of your code
 }
 ```
 
-### Override Props in all Annotations
+### Override Props in all Attributes
 
-In all your annotations, you can have something like this:
+In all your attributes, you can have something like this:
 ```php
-    /**
-     * @Mixpanel\Track("Your event", props={
-     *      "user_id": @Mixpanel\Expression("user.getId()")
-     * })
-     */
+    #[Mixpanel\Track('Your event', props: [
+        'user_id' => new Mixpanel\Expression('user.getId()'),
+    ])]
     public function yourAction()
     {
         // ...
     }
 ```
-It can be annoying to always have to put the same properties in your annotations. The functioning of the events allows us to avoid that.
+It can be annoying to always have to put the same properties in your attributes. The functioning of the events allows us to avoid that.
 
 ```php
 namespace YourNamespace;
 
-use Doctrine\Common\Annotations\Reader;
 use Gordalina\MixpanelBundle\Annotation;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
-use Symfony\Component\Security\Core\Security;
 
 class MixpanelListener
 {
-    private $annotationReader;
-    private $security;
-
-    public function __construct(Reader $annotationReader, Security $security)
+    public function __construct(private Security $security)
     {
-        $this->annotationReader = $annotationReader;
-        $this->security         = $security;
     }
 
-    public function onKernelController(ControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
-        if (!\is_array($controller = $event->getController())) {
-            return;
-        }
-
-        $className = \get_class($controller[0]);
-        $object    = new \ReflectionClass($className);
-        $method    = $object->getMethod($controller[1]);
-
-        $classAnnotations  = $this->annotationReader->getClassAnnotations($object);
-        $methodAnnotations = $this->annotationReader->getMethodAnnotations($method);
-
-        foreach ([$classAnnotations, $methodAnnotations] as $collection) {
-            foreach ($collection as $annotation) {
-                if ($annotation instanceof Annotation\Annotation && property_exists($annotation, 'props')) {
-                    $annotation->props['user_id'] = $this->security->getUser()->getId();
+        foreach ($event->getAttributes() as $attributes) {
+            foreach ($attributes as $attribute) {
+                if ($attribute instanceof Annotation\Annotation && property_exists($attribute, 'props')) {
+                    $attribute->props['user_id'] = $this->security->getUser()->getId();
                 }
             }
         }
@@ -324,15 +312,87 @@ class MixpanelListener
 
 And in your config:
 ```yaml
+# config/services.yaml
+
+services:
     YourNamespace\MixpanelListener:
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -200 }
 ```
 
+**Note**: the priority must be higher than `-256`, which is the priority the bundle's
+own listener runs at. `ControllerEvent::getAttributes()` returns the very instances
+the bundle will read, so mutating them here is enough.
+
+**Upgrading**: if such a listener previously used a `Doctrine\Common\Annotations\Reader`
+to reach the annotations, it must be rewritten as above. A reader never sees PHP
+attributes, so the moment a controller is migrated the listener stops enriching
+anything — silently, with the events still being sent without the added properties.
+
+### Upgrading from Doctrine annotations
+
+Doctrine annotations still work in this version, but they are deprecated and will
+be removed in the next major version. Symfony 7 no longer ships an
+`annotation_reader` service, so the bundle registers its own
+(`gordalina_mixpanel.annotation_reader`) and depends on `doctrine/annotations`
+explicitly.
+
+#### Automated migration with Rector
+
+The bundle ships a [Rector](https://getrector.com) set that converts every Mixpanel
+annotation into its attribute form. Install Rector, then point it at your code:
+
+```php
+// rector.php
+declare(strict_types=1);
+
+use Gordalina\MixpanelBundle\Rector\MixpanelSetList;
+use Rector\Config\RectorConfig;
+
+return RectorConfig::configure()
+    ->withPaths([__DIR__.'/src'])
+    ->withSets([MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES]);
+```
+
+```sh
+$ vendor/bin/rector --dry-run   # review first
+$ vendor/bin/rector
+```
+
+Nested values are handled too — `@Mixpanel\Id` becomes `new Mixpanel\Id()` and
+`@Mixpanel\Expression("...")` becomes `new Mixpanel\Expression('...')`:
+
+```php
+// before
+/**
+ * @Mixpanel\Track("Order Completed", props={
+ *      "user_id": @Mixpanel\Expression("user.getId()")
+ * })
+ * @Mixpanel\Set(id=@Mixpanel\Id, props={"plan": "pro"})
+ */
+
+// after
+#[Mixpanel\Track('Order Completed', props: ['user_id' => new Mixpanel\Expression('user.getId()')])]
+#[Mixpanel\Set(id: new Mixpanel\Id(), props: ['plan' => 'pro'])]
+```
+
+#### Manual migration
+
+If you'd rather convert by hand, two things to watch out for:
+
+- Nested actions such as `@Mixpanel\Id` or `@Mixpanel\Expression(...)` become real
+  object instantiations: `new Mixpanel\Id()`, `new Mixpanel\Expression('...')`
+- `@Mixpanel\Remove` takes a `props` array, not a `prop` scalar — the previous
+  README documented this incorrectly
+- Any listener of your own that reads Mixpanel annotations through a
+  `Doctrine\Common\Annotations\Reader` must move to
+  [`ControllerEvent::getAttributes()`](#override-props-in-all-attributes) at the
+  same time, otherwise it stops seeing the migrated controllers without any error
+
 
 ### Symfony Profiler Integration
 
-Mixpanel bundle additionally integrates with Symfony2 profiler. You can
+Mixpanel bundle additionally integrates with the Symfony profiler. You can
 check number of events and engagements sent, total execution time and other information.
 
 ![Example
@@ -345,13 +405,13 @@ Reference Configuration
 You'll find the reference configuration below:
 
 ``` yaml
-# app/config/config*.yml
+# config/packages/gordalina_mixpanel.yaml
 
 gordalina_mixpanel:
-    enabled: true                                        # defaults to true
-    enable_profiler: %kernel.debug%                      # defaults to %kernel.debug%
-    auto_update_user: %kernel.debug%                     # defaults to %kernel.debug%
-    throw_on_user_data_attribute_failure: %kernel.debug% # defaults to %kernel.debug%
+    enabled: true                                          # defaults to true
+    enable_profiler: '%kernel.debug%'                      # defaults to %kernel.debug%
+    auto_update_user: '%kernel.debug%'                     # defaults to %kernel.debug%
+    throw_on_user_data_attribute_failure: '%kernel.debug%' # defaults to %kernel.debug%
     projects:
         default:
             token: xxxxxxxxxxxxxxxxxxxxxxxxxxxx # required

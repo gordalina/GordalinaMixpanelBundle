@@ -27,12 +27,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  */
 class GordalinaMixpanelExtension extends Extension
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
-        $configuration = new Configuration($container->getParameter('kernel.debug'));
+        $configuration = new Configuration((bool) $container->getParameter('kernel.debug'));
         $config        = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
@@ -42,7 +39,7 @@ class GordalinaMixpanelExtension extends Extension
         $this->loadParameters($config, $container);
     }
 
-    private function loadRegistry(array $config, ContainerBuilder $container)
+    private function loadRegistry(array $config, ContainerBuilder $container): void
     {
         if (array_key_exists('default', $config['projects'])) {
             $default = 'default';
@@ -79,7 +76,7 @@ class GordalinaMixpanelExtension extends Extension
         }
     }
 
-    private function loadParameters(array $config, ContainerBuilder $container)
+    private function loadParameters(array $config, ContainerBuilder $container): void
     {
         $container->setParameter('gordalina_mixpanel.enabled', $config['enabled']);
         $container->setParameter('gordalina_mixpanel.enable_profiler', $config['enable_profiler']);

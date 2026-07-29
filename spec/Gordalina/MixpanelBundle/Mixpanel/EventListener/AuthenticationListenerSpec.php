@@ -27,7 +27,7 @@ class AuthenticationListenerSpec extends ObjectBehavior
     public function it_should_pass_authentication_token_to_authentication_service(
         Authentication $authentication,
         AuthenticationEvent $event,
-        TokenInterface $token
+        TokenInterface $token,
     ) {
         $event->getAuthenticationToken()->willReturn($token);
 
@@ -39,7 +39,7 @@ class AuthenticationListenerSpec extends ObjectBehavior
     public function it_should_pass_authenticated_token_to_authentication_service(
         Authentication $authentication,
         LoginSuccessEvent $event,
-        TokenInterface $token
+        TokenInterface $token,
     ) {
         $event->getAuthenticatedToken()->willReturn($token);
 

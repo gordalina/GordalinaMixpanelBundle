@@ -41,14 +41,14 @@ class MixpanelListener implements EventSubscriberInterface
         $this->sendUserIpToMixpanel = $sendUserIpToMixpanel;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             MixpanelEvent::class => 'sendEvent',
         ];
     }
 
-    public function sendEvent(MixpanelEvent $event)
+    public function sendEvent(MixpanelEvent $event): void
     {
         if (!$this->sendDataToMixpanel) {
             return;
@@ -59,29 +59,29 @@ class MixpanelListener implements EventSubscriberInterface
         $instance   = $this->getMixpanelInstance($annotation->project);
 
         if ($annotation instanceof Annotation\Track) {
-            $instance->track($annotation->event, $annotation->props ?? []);
+            $instance->track($annotation->event, $annotation->props);
         } elseif ($annotation instanceof Annotation\Unregister) {
             $instance->unregister($annotation->prop);
         } elseif ($annotation instanceof Annotation\Register) {
             $instance->register($annotation->prop, $annotation->value);
         } elseif ($annotation instanceof Annotation\Set) {
-            $instance->people->set($annotation->id, $annotation->props, $this->getUserIp($request), (bool) $annotation->ignoreTime);
+            $instance->people->set($annotation->id, $annotation->props, $this->getUserIp($request), $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\SetOnce) {
-            $instance->people->setOnce($annotation->id, $annotation->props, $this->getUserIp($request), (bool) $annotation->ignoreTime);
+            $instance->people->setOnce($annotation->id, $annotation->props, $this->getUserIp($request), $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\Remove) {
-            $instance->people->remove($annotation->id, $annotation->props, $this->getUserIp($request), (bool) $annotation->ignoreTime);
+            $instance->people->remove($annotation->id, $annotation->props, $this->getUserIp($request), $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\Increment) {
-            $instance->people->increment($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), (bool) $annotation->ignoreTime);
+            $instance->people->increment($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\Append) {
-            $instance->people->append($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), (bool) $annotation->ignoreTime);
+            $instance->people->append($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\TrackCharge) {
-            $instance->people->trackCharge($annotation->id, $annotation->amount, $timestamp = null, $this->getUserIp($request), (bool) $annotation->ignoreTime);
+            $instance->people->trackCharge($annotation->id, $annotation->amount, null, $this->getUserIp($request), $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\ClearCharges) {
-            $instance->people->clearCharges($annotation->id, $request->getClientIp(), (bool) $annotation->ignoreTime);
+            $instance->people->clearCharges($annotation->id, $request->getClientIp(), $annotation->ignoreTime);
         } elseif ($annotation instanceof Annotation\UpdateUser) {
             $instance->people->set($this->getId(), $this->getUserProperties(), $this->getUserIp($request));
         } elseif ($annotation instanceof Annotation\DeleteUser) {
-            $instance->people->deleteUser($annotation->id, $this->getUserIp($request), (bool) $annotation->ignoreTime);
+            $instance->people->deleteUser($annotation->id, $this->getUserIp($request), $annotation->ignoreTime);
         }
     }
 
@@ -89,9 +89,9 @@ class MixpanelListener implements EventSubscriberInterface
     {
         if (null === $project || 0 === strlen(trim($project))) {
             return $this->registry->getProject('gordalina_mixpanel.default');
-        } else {
-            return $this->registry->getProject("gordalina_mixpanel.{$project}");
         }
+
+        return $this->registry->getProject("gordalina_mixpanel.{$project}");
     }
 
     private function getUserProperties(): array

@@ -14,17 +14,21 @@ declare(strict_types=1);
 namespace Gordalina\MixpanelBundle\Annotation;
 
 /**
+ * Placeholder resolved by evaluating an ExpressionLanguage expression.
+ *
+ * Used as a value of another attribute, e.g.
+ * #[Track('Order Completed', props: ['user_id' => new Expression('user.getId()')])]
+ *
  * @Annotation
+ * @NamedArgumentConstructor
  * @Target("ANNOTATION")
  *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
 final class Expression
 {
-    /**
-     * @Required
-     *
-     * @var string
-     */
-    public $expression;
+    public function __construct(
+        public string $expression,
+    ) {
+    }
 }

@@ -1,3 +1,134 @@
+## [v6.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/6.0.0)
+
+[5.1.1...6.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.1.1...6.0.0)
+
+### Breaking Changes
+
+- Added support for Symfony `^7.0`, dropped support for Symfony `<6.4` and PHP `<8.2`
+- Annotation classes now declare a constructor, so their required values must be
+  passed to it instead of being assigned afterwards. This affects code building
+  annotations by hand to dispatch a `MixpanelEvent`:
+
+```php
+// before
+$annotation = new Annotation\Track();
+$annotation->event = 'My event';
+$annotation->props = ['prop 1' => 'data 1'];
+
+// after
+$annotation = new Annotation\Track('My event', ['prop 1' => 'data 1']);
+```
+
+- `Annotation\Id` and `Annotation\Expression` are now instantiated explicitly
+  when used as a value of another action, e.g. `new Annotation\Expression('user.getId()')`
+- The `condition` property is no longer overwritten with the result of its own
+  evaluation; it keeps the expression it was given and is evaluated on each request
+- Symfony 7 no longer dispatches `security.authentication.failure`, so
+  `AuthenticationListener::onAuthenticationFailure()` is now wired to
+  `Symfony\Component\Security\Http\Event\LoginFailureEvent` (the signature it
+  already declared)
+- Removed the `first_name`, `last_name`, `email` and `phone` user options,
+  deprecated since 3.2. Prefix them with `$` to send Mixpanel reserved
+  properties:
+
+```yaml
+gordalina_mixpanel:
+    users:
+        App\Entity\User:
+            id: id
+            $first_name: firstName # was: first_name
+            $last_name: lastName   # was: last_name
+            $email: email          # was: email
+            $phone: phone          # was: phone
+```
+
+### Features
+
+- Mixpanel actions can now be declared as PHP attributes, and are repeatable:
+
+```php
+use Gordalina\MixpanelBundle\Annotation as Mixpanel;
+
+class CheckoutController
+{
+    #[Mixpanel\Track('View Checkout')]
+    #[Mixpanel\Set(props: ['plan' => 'pro'], id: new Mixpanel\Id())]
+    public function view(Request $request)
+    {
+        // ...
+    }
+}
+```
+
+- `Annotation\Append` now accepts any value type, matching its documented usage
+  (`value: 'apples'`); it was previously restricted to integers
+- Added a Rector set to automate the annotation to attribute migration, including
+  nested `@Mixpanel\Id` / `@Mixpanel\Expression` values:
+
+```php
+// rector.php
+use Gordalina\MixpanelBundle\Rector\MixpanelSetList;
+use Rector\Config\RectorConfig;
+
+return RectorConfig::configure()
+    ->withPaths([__DIR__.'/src'])
+    ->withSets([MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES]);
+```
+
+- Listeners that enrich a Mixpanel annotation before this bundle reads it must be
+  rewritten against `ControllerEvent::getAttributes()`. A cached annotation reader
+  returns the same annotation instances on every call, which is what made the
+  reader-based pattern work; a reader never sees PHP attributes, so once a
+  controller is migrated such a listener silently enriches nothing and events are
+  sent without the added properties:
+
+```php
+// before — only ever saw Doctrine annotations
+foreach ($this->annotationReader->getMethodAnnotations($method) as $annotation) {
+    if (property_exists($annotation, 'props')) {
+        $annotation->props['user_id'] = $this->security->getUser()->getId();
+    }
+}
+
+// after — sees attributes, and the instances this bundle dispatches
+foreach ($event->getAttributes() as $attributes) {
+    foreach ($attributes as $attribute) {
+        if ($attribute instanceof Annotation\Annotation && property_exists($attribute, 'props')) {
+            $attribute->props['user_id'] = $this->security->getUser()->getId();
+        }
+    }
+}
+```
+
+### Fixes
+
+- The `users` shorthand syntax (`App\Entity\User: id`) now works. Two `ifTrue()`
+  calls shared a single expression builder, so the second silently replaced the
+  first: the shorthand was never normalised and the duplicate-property check
+  raised a PHP warning on it instead
+
+### Deprecations
+
+- Declaring Mixpanel actions as Doctrine annotations is deprecated, use PHP
+  attributes instead. Symfony 7 removed its `annotation_reader` service, so the
+  bundle now registers its own (`gordalina_mixpanel.annotation_reader`) and
+  depends on `doctrine/annotations` explicitly. Both the dependency and the
+  annotation support will be removed in the next major version.
+
+  On Symfony 6.4 the bundle keeps reusing the framework's `annotation_reader`,
+  and on Symfony 7 it aliases `Doctrine\Common\Annotations\Reader` to its own,
+  so the reader stays shared with the rest of the application. Registering a
+  private reader would have made annotations enriched elsewhere invisible to
+  this bundle.
+
+## [v5.1.1](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.1.1)
+
+[5.1.0...5.1.1](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.1.0...5.1.1)
+
+### Fixes
+
+- Renamed `FinishRequestListener.php` to `TerminateListener.php` so the file name matches the `TerminateListener` class it declares, which PSR-4 autoloading requires [#41](https://github.com/gordalina/GordalinaMixpanelBundle/pull/41)
+
 ## [v5.1.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/5.1.0)
 
 [5.0.3...5.1.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.0.3...5.1.0)

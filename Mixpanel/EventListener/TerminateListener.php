@@ -28,7 +28,7 @@ class TerminateListener
         $this->flusher = $flusher;
     }
 
-    public function onTerminate(TerminateEvent $e)
+    public function onTerminate(TerminateEvent $e): void
     {
         $this->flusher->flush();
     }
