@@ -1,3 +1,59 @@
+## [v7.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/7.0.0)
+
+[6.0.0...7.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/6.0.0...7.0.0)
+
+### Breaking Changes
+
+- Added support for Symfony `^8.0`. Symfony `^7.0` is now narrowed to `^7.4`:
+  7.0 to 7.3 are all end-of-life, so the bundle supports exactly the three
+  maintained branches, `^6.4 || ^7.4 || ^8.0`. Symfony 8 itself requires PHP
+  `>= 8.4`; the bundle keeps PHP `^8.2` for Symfony 6.4 and 7.4 users.
+- Doctrine annotations are no longer read. They were deprecated in 6.0 and are
+  now removed:
+  - the `doctrine/annotations` dependency is gone
+  - the `gordalina_mixpanel.annotation_reader` service, the
+    `Doctrine\Common\Annotations\Reader` autowiring alias and
+    `DependencyInjection\Compiler\AnnotationReaderPass` are gone
+  - `ControllerListener::__construct()` no longer takes an `$annotationReader`
+    argument
+  - the `@Annotation`, `@NamedArgumentConstructor` and `@Target` docblock tags
+    were removed from the action classes
+
+  **This does not fail loudly.** An un-migrated annotation is just a comment, so
+  the controller keeps working and the event is silently never sent. Migrate every
+  annotation, then grep for `@Mixpanel\` to confirm none are left. See
+  [Upgrading from 6.x](README.md#upgrading-from-6x).
+- Renamed everything still called "annotation", now that the classes are only ever
+  attributes:
+
+  - the `Gordalina\MixpanelBundle\Annotation` namespace is now
+    `Gordalina\MixpanelBundle\Attribute`
+  - its base class, `Annotation\Annotation`, is now `Attribute\Action`
+  - `MixpanelEvent::getAnnotation()` is now `MixpanelEvent::getAttribute()`
+
+  The 14 action classes keep their names, so the aliased style used throughout the
+  docs migrates with a single `use` line per file. Unlike the annotation removal
+  above, this one fails loudly — a missing class or method is a hard error. The
+  README documents a `sed` one-liner, and a Rector config for each starting point.
+- Removed the Rector set that shipped with 6.0,
+  `Rector\MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES`, along with
+  `Resources/rector/annotations-to-attributes.php`. Rector was never a dependency
+  of this bundle, so the set was the only code here that nothing could verify — no
+  CI job ran it and PHPStan did not analyse it, meaning a Rector API rename would
+  have shipped broken. The equivalent configuration is now documented inline in
+  the README, to be pasted into the `rector.php` of the project being migrated,
+  where the Rector version in use is actually known. Users still on 6.x keep the
+  set: migrate before upgrading, which is the recommended order anyway.
+- The `Gordalina\MixpanelBundle\Annotation` namespace is *not* renamed. Its
+  classes are attributes now, but the name is kept so no `use` statement has to
+  change.
+
+### Features
+
+- `symfony/yaml` is now an explicit dependency. The bundle loads its own
+  `services.yml` at compile time, so it always needed it; it just happened to be
+  installed by something else in practice.
+
 ## [v6.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/6.0.0)
 
 [5.1.1...6.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.1.1...6.0.0)
