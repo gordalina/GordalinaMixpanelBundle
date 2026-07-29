@@ -27,10 +27,12 @@ into Symfony.
 Installation
 ------------
 
+This version requires PHP `^8.2` and Symfony `^6.4 || ^7.4 || ^8.0`.
+
 Require [`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle) using composer
 
 ```sh
-$ php composer.phar require gordalina/mixpanel-bundle:~6.0
+$ php composer.phar require gordalina/mixpanel-bundle:~7.0
 ```
 
 Or require
@@ -41,7 +43,7 @@ to your `composer.json` file:
 ```json
 {
     "require": {
-        "gordalina/mixpanel-bundle": "~6.0"
+        "gordalina/mixpanel-bundle": "~7.0"
     }
 }
 ```
