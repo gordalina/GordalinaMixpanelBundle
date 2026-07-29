@@ -12,6 +12,5 @@ parameters:
         - Annotation
         - Mixpanel
         - DependencyInjection
-        - Rector
 
     inferPrivatePropertyTypeFromConstructor: true

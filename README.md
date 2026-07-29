@@ -342,25 +342,53 @@ grep your codebase for `@Mixpanel\` afterwards to confirm none are left.
 
 #### Automated migration with Rector
 
-The bundle ships a [Rector](https://getrector.com) set that converts every Mixpanel
-annotation into its attribute form. Install Rector, then point it at your code:
+[Rector](https://getrector.com) converts every Mixpanel annotation into its
+attribute form. It rewrites docblocks, so it works whether you run it before or
+after bumping the bundle. Install Rector and drop this into your `rector.php`:
 
 ```php
 // rector.php
 declare(strict_types=1);
 
-use Gordalina\MixpanelBundle\Rector\MixpanelSetList;
 use Rector\Config\RectorConfig;
+use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
+use Rector\Php80\ValueObject\AnnotationToAttribute;
 
 return RectorConfig::configure()
     ->withPaths([__DIR__.'/src'])
-    ->withSets([MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES]);
+    ->withConfiguredRule(AnnotationToAttributeRector::class, [
+        // events
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Register'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Track'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Unregister'),
+        // engagement
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Append'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\ClearCharges'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\DeleteUser'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Increment'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Remove'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Set'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\SetOnce'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\TrackCharge'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\UpdateUser'),
+    ]);
 ```
 
 ```sh
 $ vendor/bin/rector --dry-run   # review first
 $ vendor/bin/rector
 ```
+
+Run it with the bundle installed: Rector only rewrites an annotation whose target
+class it can load and finds marked `#[Attribute]`, and it skips it silently
+otherwise. So if the dry-run reports no change on a controller you know has
+annotations, the classes are not autoloadable from where you ran it — that, or a
+previous run cached the file (`--clear-cache`).
+
+Versions 6.0 to 6.x shipped this as a ready-made set
+(`MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES`). It was removed in 7.0 — the
+config above is the same thing, in the one place where the Rector version in use
+is actually known.
 
 Nested values are handled too — `@Mixpanel\Id` becomes `new Mixpanel\Id()` and
 `@Mixpanel\Expression("...")` becomes `new Mixpanel\Expression('...')`:
