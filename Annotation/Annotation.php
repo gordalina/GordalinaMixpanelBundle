@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace Gordalina\MixpanelBundle\Annotation;
 
 /**
- * Abstract Annotation
+ * Base class of every Mixpanel action.
  *
- * Concrete children are usable both as PHP attributes and, for backwards
- * compatibility, as Doctrine annotations. Doctrine annotation support is
- * deprecated and will be removed in the next major version.
+ * Concrete children are PHP attributes. The namespace is named "Annotation"
+ * for historical reasons: it predates PHP attributes and keeping it spares
+ * every user a rewrite of their `use` statements.
  *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */

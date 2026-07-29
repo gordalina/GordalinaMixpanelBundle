@@ -19,10 +19,6 @@ namespace Gordalina\MixpanelBundle\Annotation;
  * Used as a value of another attribute, e.g.
  * #[Track('Order Completed', props: ['user_id' => new Expression('user.getId()')])]
  *
- * @Annotation
- * @NamedArgumentConstructor
- * @Target("ANNOTATION")
- *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
 final class Expression

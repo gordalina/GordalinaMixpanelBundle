@@ -16,7 +16,7 @@ into Symfony.
 - [Send an event based on a condition](#send-an-event-based-on-a-condition)
 - [MixpanelEvent](#mixpanelevent)
 - [Override Props in all Attributes](#override-props-in-all-attributes)
-- [Upgrading from Doctrine annotations](#upgrading-from-doctrine-annotations)
+- [Upgrading from 6.x: Doctrine annotations are gone](#upgrading-from-6x-doctrine-annotations-are-gone)
     - [Automated migration with Rector](#automated-migration-with-rector)
     - [Manual migration](#manual-migration)
 - [Symfony Profiler Integration](#symfony-profiler-integration)
@@ -324,18 +324,21 @@ services:
 own listener runs at. `ControllerEvent::getAttributes()` returns the very instances
 the bundle will read, so mutating them here is enough.
 
-**Upgrading**: if such a listener previously used a `Doctrine\Common\Annotations\Reader`
-to reach the annotations, it must be rewritten as above. A reader never sees PHP
-attributes, so the moment a controller is migrated the listener stops enriching
-anything — silently, with the events still being sent without the added properties.
+**Upgrading**: if such a listener used a `Doctrine\Common\Annotations\Reader` to
+reach the annotations, it must be rewritten as above. A reader never sees PHP
+attributes, so it stops enriching anything — silently, with the events still being
+sent without the added properties.
 
-### Upgrading from Doctrine annotations
+### Upgrading from 6.x: Doctrine annotations are gone
 
-Doctrine annotations still work in this version, but they are deprecated and will
-be removed in the next major version. Symfony 7 no longer ships an
-`annotation_reader` service, so the bundle registers its own
-(`gordalina_mixpanel.annotation_reader`) and depends on `doctrine/annotations`
-explicitly.
+Doctrine annotations were deprecated in 6.0 and are **no longer read at all** in
+7.0: the bundle no longer depends on `doctrine/annotations`, and the
+`gordalina_mixpanel.annotation_reader` service it used to register is gone.
+
+Nothing fails loudly. An un-migrated `@Mixpanel\Track(...)` docblock is just a
+comment, so the controller keeps working and the event is silently never sent.
+**Migrate every Mixpanel annotation to its attribute form before upgrading**, and
+grep your codebase for `@Mixpanel\` afterwards to confirm none are left.
 
 #### Automated migration with Rector
 
@@ -378,7 +381,7 @@ Nested values are handled too — `@Mixpanel\Id` becomes `new Mixpanel\Id()` and
 
 #### Manual migration
 
-If you'd rather convert by hand, two things to watch out for:
+If you'd rather convert by hand, three things to watch out for:
 
 - Nested actions such as `@Mixpanel\Id` or `@Mixpanel\Expression(...)` become real
   object instantiations: `new Mixpanel\Id()`, `new Mixpanel\Expression('...')`

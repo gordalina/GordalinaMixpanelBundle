@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\Mixpanel\EventListener;
 
-use Doctrine\Common\Annotations\Reader;
-use Doctrine\Common\Util\ClassUtils;
 use Gordalina\MixpanelBundle\Annotation;
 use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
 use Gordalina\MixpanelBundle\Mixpanel\Security\UserData;
@@ -27,13 +25,9 @@ class ControllerListener
 {
     private ExpressionLanguage $expressionLanguage;
 
-    /**
-     * @param Reader|null $annotationReader Reading Doctrine annotations is deprecated, use PHP attributes instead
-     */
     public function __construct(
         private UserData $userData,
         private EventDispatcherInterface $eventDispatcher,
-        private ?Reader $annotationReader = null,
     ) {
         $this->expressionLanguage = new ExpressionLanguage();
     }
@@ -42,7 +36,7 @@ class ControllerListener
     {
         $request = $event->getRequest();
 
-        foreach ($this->getAnnotations($event) as $annotation) {
+        foreach ($this->getMixpanelAttributes($event) as $annotation) {
             if (!$this->isConditionMet($annotation, $request)) {
                 continue;
             }
@@ -55,7 +49,7 @@ class ControllerListener
     /**
      * @return list<Annotation\Annotation>
      */
-    private function getAnnotations(ControllerEvent $event): array
+    private function getMixpanelAttributes(ControllerEvent $event): array
     {
         $annotations = [];
 
@@ -63,39 +57,6 @@ class ControllerListener
             foreach ($attributes as $attribute) {
                 if ($attribute instanceof Annotation\Annotation) {
                     $annotations[] = $attribute;
-                }
-            }
-        }
-
-        return array_merge($annotations, $this->getDoctrineAnnotations($event));
-    }
-
-    /**
-     * BC layer for controllers still using Doctrine annotations.
-     *
-     * @return list<Annotation\Annotation>
-     */
-    private function getDoctrineAnnotations(ControllerEvent $event): array
-    {
-        if (null === $this->annotationReader || !is_array($controller = $event->getController())) {
-            return [];
-        }
-
-        $className = class_exists('Doctrine\Common\Util\ClassUtils') ? ClassUtils::getClass($controller[0]) : get_class($controller[0]);
-        $object    = new \ReflectionClass($className);
-        $method    = $object->getMethod($controller[1]);
-
-        $collections = [
-            $this->annotationReader->getClassAnnotations($object),
-            $this->annotationReader->getMethodAnnotations($method),
-        ];
-
-        $annotations = [];
-
-        foreach ($collections as $collection) {
-            foreach ($collection as $annotation) {
-                if ($annotation instanceof Annotation\Annotation) {
-                    $annotations[] = $annotation;
                 }
             }
         }

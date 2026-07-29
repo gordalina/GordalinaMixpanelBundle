@@ -19,9 +19,6 @@ namespace Gordalina\MixpanelBundle\Annotation;
  * Used as a value of another attribute, e.g.
  * #[Set(props: ['plan' => 'pro'], id: new Id())]
  *
- * @Annotation
- * @Target("ANNOTATION")
- *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
 final class Id

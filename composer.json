@@ -21,8 +21,7 @@
         "symfony/security-http": "^6.4 || ^7.0",
         "symfony/http-kernel": "^6.4 || ^7.0",
         "symfony/property-access": "^6.4 || ^7.0",
-        "mixpanel/mixpanel-php": "~2.8",
-        "doctrine/annotations": "^2.0"
+        "mixpanel/mixpanel-php": "~2.8"
     },
     "require-dev": {
         "phpspec/phpspec": "^8.0",
