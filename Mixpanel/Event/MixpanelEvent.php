@@ -4,24 +4,24 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\Mixpanel\Event;
 
-use Gordalina\MixpanelBundle\Annotation\Annotation;
+use Gordalina\MixpanelBundle\Attribute\Action;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\EventDispatcher\Event;
 
 class MixpanelEvent extends Event
 {
-    private $annotation;
+    private $attribute;
     private $request;
 
-    public function __construct(Annotation $annotation, Request $request)
+    public function __construct(Action $attribute, Request $request)
     {
-        $this->annotation = $annotation;
-        $this->request    = $request;
+        $this->attribute = $attribute;
+        $this->request   = $request;
     }
 
-    public function getAnnotation(): Annotation
+    public function getAttribute(): Action
     {
-        return $this->annotation;
+        return $this->attribute;
     }
 
     public function getRequest(): Request

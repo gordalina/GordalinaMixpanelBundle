@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\Mixpanel\EventListener;
 
-use Gordalina\MixpanelBundle\Annotation;
+use Gordalina\MixpanelBundle\Attribute;
 use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
 use Gordalina\MixpanelBundle\Mixpanel\Security\UserData;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -36,51 +36,51 @@ class ControllerListener
     {
         $request = $event->getRequest();
 
-        foreach ($this->getMixpanelAttributes($event) as $annotation) {
-            if (!$this->isConditionMet($annotation, $request)) {
+        foreach ($this->getMixpanelAttributes($event) as $attribute) {
+            if (!$this->isConditionMet($attribute, $request)) {
                 continue;
             }
 
-            $this->prepareAnnotation($annotation, $request);
-            $this->eventDispatcher->dispatch(new MixpanelEvent($annotation, $request));
+            $this->prepareAttribute($attribute, $request);
+            $this->eventDispatcher->dispatch(new MixpanelEvent($attribute, $request));
         }
     }
 
     /**
-     * @return list<Annotation\Annotation>
+     * @return list<Attribute\Action>
      */
     private function getMixpanelAttributes(ControllerEvent $event): array
     {
-        $annotations = [];
+        $mixpanelAttributes = [];
 
         foreach ($event->getAttributes() as $attributes) {
             foreach ($attributes as $attribute) {
-                if ($attribute instanceof Annotation\Annotation) {
-                    $annotations[] = $attribute;
+                if ($attribute instanceof Attribute\Action) {
+                    $mixpanelAttributes[] = $attribute;
                 }
             }
         }
 
-        return $annotations;
+        return $mixpanelAttributes;
     }
 
-    private function prepareAnnotation(Annotation\Annotation $annotation, Request $request): void
+    private function prepareAttribute(Attribute\Action $attribute, Request $request): void
     {
-        foreach ($annotation as $key => $value) {
+        foreach ($attribute as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $key2 => $value2) {
-                    $this->updateDataAnnotation($annotation, $request, $key2, $value2, $key);
+                    $this->updateAttributeData($attribute, $request, $key2, $value2, $key);
                 }
                 continue;
             }
 
-            $this->updateDataAnnotation($annotation, $request, $key, $value);
+            $this->updateAttributeData($attribute, $request, $key, $value);
         }
     }
 
-    private function isConditionMet(Annotation\Annotation $annotation, Request $request): bool
+    private function isConditionMet(Attribute\Action $attribute, Request $request): bool
     {
-        $condition = $annotation->condition;
+        $condition = $attribute->condition;
 
         if (null === $condition) {
             return true;
@@ -93,15 +93,15 @@ class ControllerListener
         return true === $this->expressionLanguage->evaluate($condition, array_merge(['request' => $request], $request->attributes->all()));
     }
 
-    private function updateDataAnnotation(Annotation\Annotation $annotation, Request $request, string $key, mixed $value, ?string $parentKey = null): void
+    private function updateAttributeData(Attribute\Action $attribute, Request $request, string $key, mixed $value, ?string $parentKey = null): void
     {
         $element = null;
 
-        if ($value instanceof Annotation\Id) {
+        if ($value instanceof Attribute\Id) {
             $element = $this->userData->getId();
         }
 
-        if ($value instanceof Annotation\Expression) {
+        if ($value instanceof Attribute\Expression) {
             $element = $this->expressionLanguage->evaluate($value->expression, array_merge($request->attributes->all(), ['request' => $request]));
         }
 
@@ -110,9 +110,9 @@ class ControllerListener
         }
 
         if (null !== $parentKey) {
-            $annotation->$parentKey[$key] = $element;
+            $attribute->$parentKey[$key] = $element;
         } else {
-            $annotation->$key = $element;
+            $attribute->$key = $element;
         }
     }
 }

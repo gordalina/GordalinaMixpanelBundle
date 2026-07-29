@@ -11,19 +11,20 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Annotation;
+namespace Gordalina\MixpanelBundle\Attribute;
 
 /**
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-final class Append extends Annotation
+final class Track extends Action
 {
+    /**
+     * @param array<string, mixed> $props
+     */
     public function __construct(
-        public string $prop,
-        public mixed $value,
-        public mixed $id = null,
-        public bool $ignoreTime = false,
+        public mixed $event,
+        public array $props = [],
         ?string $project = null,
         string|bool|null $condition = null,
     ) {

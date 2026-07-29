@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\Mixpanel\EventListener;
 
-use Gordalina\MixpanelBundle\Annotation\UpdateUser;
+use Gordalina\MixpanelBundle\Attribute\UpdateUser;
 use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
 use Gordalina\MixpanelBundle\Mixpanel\Security\Authentication;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

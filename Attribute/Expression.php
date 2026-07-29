@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Annotation;
+namespace Gordalina\MixpanelBundle\Attribute;
 
 /**
  * Placeholder resolved by evaluating an ExpressionLanguage expression.

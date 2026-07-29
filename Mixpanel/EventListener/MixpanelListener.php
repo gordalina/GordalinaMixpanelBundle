@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle\Mixpanel\EventListener;
 
-use Gordalina\MixpanelBundle\Annotation;
+use Gordalina\MixpanelBundle\Attribute;
 use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
 use Gordalina\MixpanelBundle\Mixpanel\ManagerRegistry;
 use Gordalina\MixpanelBundle\Mixpanel\Security\UserData;
@@ -54,34 +54,34 @@ class MixpanelListener implements EventSubscriberInterface
             return;
         }
 
-        $annotation = $event->getAnnotation();
-        $request    = $event->getRequest();
-        $instance   = $this->getMixpanelInstance($annotation->project);
+        $attribute = $event->getAttribute();
+        $request   = $event->getRequest();
+        $instance  = $this->getMixpanelInstance($attribute->project);
 
-        if ($annotation instanceof Annotation\Track) {
-            $instance->track($annotation->event, $annotation->props);
-        } elseif ($annotation instanceof Annotation\Unregister) {
-            $instance->unregister($annotation->prop);
-        } elseif ($annotation instanceof Annotation\Register) {
-            $instance->register($annotation->prop, $annotation->value);
-        } elseif ($annotation instanceof Annotation\Set) {
-            $instance->people->set($annotation->id, $annotation->props, $this->getUserIp($request), $annotation->ignoreTime);
-        } elseif ($annotation instanceof Annotation\SetOnce) {
-            $instance->people->setOnce($annotation->id, $annotation->props, $this->getUserIp($request), $annotation->ignoreTime);
-        } elseif ($annotation instanceof Annotation\Remove) {
-            $instance->people->remove($annotation->id, $annotation->props, $this->getUserIp($request), $annotation->ignoreTime);
-        } elseif ($annotation instanceof Annotation\Increment) {
-            $instance->people->increment($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), $annotation->ignoreTime);
-        } elseif ($annotation instanceof Annotation\Append) {
-            $instance->people->append($annotation->id, $annotation->prop, $annotation->value, $this->getUserIp($request), $annotation->ignoreTime);
-        } elseif ($annotation instanceof Annotation\TrackCharge) {
-            $instance->people->trackCharge($annotation->id, $annotation->amount, null, $this->getUserIp($request), $annotation->ignoreTime);
-        } elseif ($annotation instanceof Annotation\ClearCharges) {
-            $instance->people->clearCharges($annotation->id, $request->getClientIp(), $annotation->ignoreTime);
-        } elseif ($annotation instanceof Annotation\UpdateUser) {
+        if ($attribute instanceof Attribute\Track) {
+            $instance->track($attribute->event, $attribute->props);
+        } elseif ($attribute instanceof Attribute\Unregister) {
+            $instance->unregister($attribute->prop);
+        } elseif ($attribute instanceof Attribute\Register) {
+            $instance->register($attribute->prop, $attribute->value);
+        } elseif ($attribute instanceof Attribute\Set) {
+            $instance->people->set($attribute->id, $attribute->props, $this->getUserIp($request), $attribute->ignoreTime);
+        } elseif ($attribute instanceof Attribute\SetOnce) {
+            $instance->people->setOnce($attribute->id, $attribute->props, $this->getUserIp($request), $attribute->ignoreTime);
+        } elseif ($attribute instanceof Attribute\Remove) {
+            $instance->people->remove($attribute->id, $attribute->props, $this->getUserIp($request), $attribute->ignoreTime);
+        } elseif ($attribute instanceof Attribute\Increment) {
+            $instance->people->increment($attribute->id, $attribute->prop, $attribute->value, $this->getUserIp($request), $attribute->ignoreTime);
+        } elseif ($attribute instanceof Attribute\Append) {
+            $instance->people->append($attribute->id, $attribute->prop, $attribute->value, $this->getUserIp($request), $attribute->ignoreTime);
+        } elseif ($attribute instanceof Attribute\TrackCharge) {
+            $instance->people->trackCharge($attribute->id, $attribute->amount, null, $this->getUserIp($request), $attribute->ignoreTime);
+        } elseif ($attribute instanceof Attribute\ClearCharges) {
+            $instance->people->clearCharges($attribute->id, $request->getClientIp(), $attribute->ignoreTime);
+        } elseif ($attribute instanceof Attribute\UpdateUser) {
             $instance->people->set($this->getId(), $this->getUserProperties(), $this->getUserIp($request));
-        } elseif ($annotation instanceof Annotation\DeleteUser) {
-            $instance->people->deleteUser($annotation->id, $this->getUserIp($request), $annotation->ignoreTime);
+        } elseif ($attribute instanceof Attribute\DeleteUser) {
+            $instance->people->deleteUser($attribute->id, $this->getUserIp($request), $attribute->ignoreTime);
         }
     }
 

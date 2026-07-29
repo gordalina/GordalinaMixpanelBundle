@@ -11,13 +11,13 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Annotation;
+namespace Gordalina\MixpanelBundle\Attribute;
 
 /**
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-final class Set extends Annotation
+final class SetOnce extends Action
 {
     /**
      * @param array<string, mixed> $props

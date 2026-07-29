@@ -1,6 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Variable property access on Gordalina\\\\MixpanelBundle\\\\Annotation\\\\Annotation\\.$#"
+			message: "#^Variable property access on Gordalina\\\\MixpanelBundle\\\\Attribute\\\\Action\\.$#"
 			count: 2
 			path: Mixpanel/EventListener/ControllerListener.php

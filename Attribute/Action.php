@@ -11,18 +11,14 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Annotation;
+namespace Gordalina\MixpanelBundle\Attribute;
 
 /**
  * Base class of every Mixpanel action.
  *
- * Concrete children are PHP attributes. The namespace is named "Annotation"
- * for historical reasons: it predates PHP attributes and keeping it spares
- * every user a rewrite of their `use` statements.
- *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
-abstract class Annotation
+abstract class Action
 {
     public function __construct(
         public ?string $project = null,

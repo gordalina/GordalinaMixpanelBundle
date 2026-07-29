@@ -11,17 +11,21 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Annotation;
+namespace Gordalina\MixpanelBundle\Attribute;
 
 /**
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
-final class Register extends Annotation
+final class Remove extends Action
 {
+    /**
+     * @param array<string, mixed> $props
+     */
     public function __construct(
-        public string $prop,
-        public mixed $value,
+        public array $props,
+        public mixed $id = null,
+        public bool $ignoreTime = false,
         ?string $project = null,
         string|bool|null $condition = null,
     ) {
