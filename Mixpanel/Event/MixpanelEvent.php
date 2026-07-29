@@ -10,13 +10,10 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class MixpanelEvent extends Event
 {
-    private $attribute;
-    private $request;
-
-    public function __construct(Action $attribute, Request $request)
-    {
-        $this->attribute = $attribute;
-        $this->request   = $request;
+    public function __construct(
+        private Action $attribute,
+        private Request $request,
+    ) {
     }
 
     public function getAttribute(): Action

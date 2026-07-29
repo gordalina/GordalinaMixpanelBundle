@@ -18,15 +18,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class Flusher
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
-
-    /**
-     * @var Stopwatch
-     */
-    private $stopwatch;
+    private Stopwatch $stopwatch;
 
     /**
      * @var array
@@ -38,16 +30,12 @@ class Flusher
      */
     private $time;
 
-    /**
-     * @var bool
-     */
-    private $enableProfiler;
-
-    public function __construct(ManagerRegistry $registry, ?Stopwatch $stopwatch = null, bool $enableProfiler = false)
-    {
-        $this->registry       = $registry;
-        $this->stopwatch      = $stopwatch ?? new Stopwatch();
-        $this->enableProfiler = $enableProfiler;
+    public function __construct(
+        private ManagerRegistry $registry,
+        ?Stopwatch $stopwatch = null,
+        private bool $enableProfiler = false,
+    ) {
+        $this->stopwatch = $stopwatch ?? new Stopwatch();
     }
 
     public function flush()

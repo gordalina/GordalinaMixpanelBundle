@@ -13,32 +13,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MixpanelListener implements EventSubscriberInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
-
-    /**
-     * @var UserData
-     */
-    private $userData;
-
-    /**
-     * @var bool
-     */
-    private $sendDataToMixpanel;
-
-    /**
-     * @var bool
-     */
-    private $sendUserIpToMixpanel;
-
-    public function __construct(ManagerRegistry $registry, UserData $userData, bool $sendDataToMixpanel, bool $sendUserIpToMixpanel)
-    {
-        $this->registry             = $registry;
-        $this->userData             = $userData;
-        $this->sendDataToMixpanel   = $sendDataToMixpanel;
-        $this->sendUserIpToMixpanel = $sendUserIpToMixpanel;
+    public function __construct(
+        private ManagerRegistry $registry,
+        private UserData $userData,
+        private bool $sendDataToMixpanel,
+        private bool $sendUserIpToMixpanel,
+    ) {
     }
 
     public static function getSubscribedEvents(): array

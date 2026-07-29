@@ -28,38 +28,13 @@ use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 
 class AuthenticationListener
 {
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
-
-    /**
-     * @var Authentication
-     */
-    private $authentication;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var bool
-     */
-    private $autoUpdateUser;
-
-    /**
-     * @var bool
-     */
-    private $sendDataToMixpanel;
-
-    public function __construct(TokenStorageInterface $tokenStorage, Authentication $authentication, EventDispatcherInterface $eventDispatcher, bool $autoUpdateUser, bool $sendDataToMixpanel)
-    {
-        $this->tokenStorage       = $tokenStorage;
-        $this->authentication     = $authentication;
-        $this->eventDispatcher    = $eventDispatcher;
-        $this->autoUpdateUser     = $autoUpdateUser;
-        $this->sendDataToMixpanel = $sendDataToMixpanel;
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private Authentication $authentication,
+        private EventDispatcherInterface $eventDispatcher,
+        private bool $autoUpdateUser,
+        private bool $sendDataToMixpanel,
+    ) {
     }
 
     public function onAuthenticationSuccess(AuthenticationEvent $e): void

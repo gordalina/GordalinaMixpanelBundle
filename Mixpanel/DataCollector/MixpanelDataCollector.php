@@ -22,20 +22,10 @@ use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 
 class MixpanelDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
-
-    /**
-     * @var Flusher
-     */
-    private $flusher;
-
-    public function __construct(ManagerRegistry $registry, Flusher $flusher)
-    {
-        $this->registry = $registry;
-        $this->flusher  = $flusher;
+    public function __construct(
+        private ManagerRegistry $registry,
+        private Flusher $flusher,
+    ) {
     }
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void

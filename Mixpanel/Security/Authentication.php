@@ -19,26 +19,11 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class Authentication
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
-
-    /**
-     * @var UserData
-     */
-    private $userData;
-
-    /**
-     * @var Flusher
-     */
-    private $flusher;
-
-    public function __construct(ManagerRegistry $registry, UserData $userData, Flusher $flusher)
-    {
-        $this->registry = $registry;
-        $this->userData = $userData;
-        $this->flusher  = $flusher;
+    public function __construct(
+        private ManagerRegistry $registry,
+        private UserData $userData,
+        private Flusher $flusher,
+    ) {
     }
 
     public function onAuthenticationSuccess(TokenInterface $token)
