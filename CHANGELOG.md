@@ -35,11 +35,12 @@
     (`new MixpanelEvent(annotation: $a, request: $r)`), which is documented usage;
     positional construction is unchanged
 
-  The 14 action classes keep their names, so the aliased style used throughout the
-  docs migrates with a single `use` line per file. Unlike the annotation removal
-  above, this one fails loudly — a missing class, method or named parameter is a
-  hard error. [Upgrading from 6.x](#upgrading-from-6x) documents a `sed` one-liner,
-  and a Rector config for each starting point.
+  The 12 action classes and the two value placeholders keep their names, so the
+  aliased style used throughout the docs migrates with a single `use` line per
+  file. Unlike the annotation removal above, this one fails loudly — a missing
+  class, method or named parameter is a hard error.
+  [Upgrading from 6.x](#upgrading-from-6x) documents a `sed` one-liner, and a
+  Rector config for each starting point.
 - Removed the Rector set that shipped with 6.0,
   `Rector\MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES`, along with
   `Resources/rector/annotations-to-attributes.php`. Rector was never a dependency
@@ -69,8 +70,8 @@ un-migrated `@Mixpanel\Track(...)` docblock is just a comment, so the controller
 keeps working and the event is silently never sent. This is the one to be careful
 with: nothing tells you it happened.
 
-**The `Annotation` namespace is now `Attribute`.** The 14 action classes keep their
-names, but the things around them changed:
+**The `Annotation` namespace is now `Attribute`.** The 12 action classes and the two
+value placeholders keep their names, but the things around them changed:
 
 | 6.x | 7.0 |
 | --- | --- |
