@@ -8,9 +8,9 @@ parameters:
     level: 1
 
     paths:
-        - Annotation
+        - GordalinaMixpanelBundle.php
+        - Attribute
         - Mixpanel
         - DependencyInjection
-        - Rector
 
     inferPrivatePropertyTypeFromConstructor: true

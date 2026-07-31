@@ -1,3 +1,234 @@
+## [v7.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/7.0.0)
+
+[6.0.0...7.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/6.0.0...7.0.0)
+
+### Breaking Changes
+
+- Added support for Symfony `^8.0`. Symfony `^7.0` is now narrowed to `^7.4`:
+  7.0 to 7.3 are all end-of-life, so the bundle supports exactly the three
+  maintained branches, `^6.4 || ^7.4 || ^8.0`. Symfony 8 itself requires PHP
+  `>= 8.4`; the bundle keeps PHP `^8.2` for Symfony 6.4 and 7.4 users.
+- Doctrine annotations are no longer read. They were deprecated in 6.0 and are
+  now removed:
+  - the `doctrine/annotations` dependency is gone
+  - the `gordalina_mixpanel.annotation_reader` service, the
+    `Doctrine\Common\Annotations\Reader` autowiring alias and
+    `DependencyInjection\Compiler\AnnotationReaderPass` are gone
+  - `ControllerListener::__construct()` no longer takes an `$annotationReader`
+    argument
+  - the `@Annotation`, `@NamedArgumentConstructor` and `@Target` docblock tags
+    were removed from the action classes
+
+  **This does not fail loudly.** An un-migrated annotation is just a comment, so
+  the controller keeps working and the event is silently never sent. Migrate every
+  annotation, then grep for `@Mixpanel\` to confirm none are left. See
+  [Upgrading from 6.x](#upgrading-from-6x).
+- Renamed everything still called "annotation", now that the classes are only ever
+  attributes:
+
+  - the `Gordalina\MixpanelBundle\Annotation` namespace is now
+    `Gordalina\MixpanelBundle\Attribute`
+  - its base class, `Annotation\Annotation`, is now `Attribute\Action`
+  - `MixpanelEvent::getAnnotation()` is now `MixpanelEvent::getAttribute()`
+  - `MixpanelEvent::__construct()`'s first parameter, `$annotation`, is now
+    `$attribute`. This only affects code that passes it as a named argument
+    (`new MixpanelEvent(annotation: $a, request: $r)`), which is documented usage;
+    positional construction is unchanged
+
+  The 12 action classes and the two value placeholders keep their names, so the
+  aliased style used throughout the docs migrates with a single `use` line per
+  file. Unlike the annotation removal above, this one fails loudly — a missing
+  class, method or named parameter is a hard error.
+  [Upgrading from 6.x](#upgrading-from-6x) documents a `sed` one-liner, and a
+  Rector config for each starting point.
+- Removed the Rector set that shipped with 6.0,
+  `Rector\MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES`, along with
+  `Resources/rector/annotations-to-attributes.php`. Rector was never a dependency
+  of this bundle, so the set was the only code here that nothing could verify — no
+  CI job ran it and PHPStan did not analyse it, meaning a Rector API rename would
+  have shipped broken. The equivalent configuration is now documented inline in
+  [Upgrading from 6.x](#upgrading-from-6x), to be pasted into the `rector.php` of
+  the project being migrated, where the Rector version in use is actually known.
+  Projects still on 6.x can run the set before upgrading — it converts annotations
+  to attributes, but not the namespace rename above, so a second pass is needed
+  either way.
+
+### Features
+
+- `symfony/yaml` is now an explicit dependency. The bundle loads its own
+  `services.yml` at compile time, so it always needed it; it just happened to be
+  installed by something else in practice.
+
+### Upgrading from 6.x
+
+Two things changed. The first fails silently, the second loudly.
+
+**Doctrine annotations are no longer read.** They were deprecated in 6.0 and are
+gone in 7.0: the bundle no longer depends on `doctrine/annotations`, and the
+`gordalina_mixpanel.annotation_reader` service it used to register is gone. An
+un-migrated `@Mixpanel\Track(...)` docblock is just a comment, so the controller
+keeps working and the event is silently never sent. This is the one to be careful
+with: nothing tells you it happened.
+
+**The `Annotation` namespace is now `Attribute`.** The 12 action classes and the two
+value placeholders keep their names, but the things around them changed:
+
+| 6.x | 7.0 |
+| --- | --- |
+| `Gordalina\MixpanelBundle\Annotation` | `Gordalina\MixpanelBundle\Attribute` |
+| `Annotation\Annotation` (base class) | `Attribute\Action` |
+| `MixpanelEvent::getAnnotation()` | `MixpanelEvent::getAttribute()` |
+| `new MixpanelEvent(annotation: …)` | `new MixpanelEvent(attribute: …)` |
+
+That one *does* fail loudly — a missing class, method or named parameter is a hard
+error — so you cannot ship it half-done by accident.
+
+Pick the path that matches your code. Both assume you have already bumped the
+bundle to 7.0, since the tooling needs the new classes to exist. If you would
+rather migrate first, the 6.x Rector set
+(`MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES`) converts annotations to attributes
+while still on 6.x — but it does not touch the namespace, so you land in
+"[If you already use attributes](#if-you-already-use-attributes)" afterwards
+either way.
+
+#### If you still use Doctrine annotations
+
+One Rector config does both migrations in a single pass: docblocks become
+attributes *and* they point at the new namespace. The `as Mixpanel` alias is
+rewritten in place, so the call sites keep the style the docs use.
+
+```php
+// rector.php
+declare(strict_types=1);
+
+use Rector\Config\RectorConfig;
+use Rector\Php80\Rector\Class_\AnnotationToAttributeRector;
+use Rector\Php80\ValueObject\AnnotationToAttribute;
+
+return RectorConfig::configure()
+    ->withPaths([__DIR__.'/src'])
+    ->withConfiguredRule(AnnotationToAttributeRector::class, [
+        // events
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Register', 'Gordalina\MixpanelBundle\Attribute\Register'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Track', 'Gordalina\MixpanelBundle\Attribute\Track'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Unregister', 'Gordalina\MixpanelBundle\Attribute\Unregister'),
+        // engagement
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Append', 'Gordalina\MixpanelBundle\Attribute\Append'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\ClearCharges', 'Gordalina\MixpanelBundle\Attribute\ClearCharges'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\DeleteUser', 'Gordalina\MixpanelBundle\Attribute\DeleteUser'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Increment', 'Gordalina\MixpanelBundle\Attribute\Increment'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Remove', 'Gordalina\MixpanelBundle\Attribute\Remove'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Set', 'Gordalina\MixpanelBundle\Attribute\Set'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\SetOnce', 'Gordalina\MixpanelBundle\Attribute\SetOnce'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\TrackCharge', 'Gordalina\MixpanelBundle\Attribute\TrackCharge'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\UpdateUser', 'Gordalina\MixpanelBundle\Attribute\UpdateUser'),
+        // value placeholders, for their nested usages
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Expression', 'Gordalina\MixpanelBundle\Attribute\Expression'),
+        new AnnotationToAttribute('Gordalina\MixpanelBundle\Annotation\Id', 'Gordalina\MixpanelBundle\Attribute\Id'),
+    ]);
+```
+
+```sh
+$ vendor/bin/rector --dry-run   # review first
+$ vendor/bin/rector
+```
+
+```php
+// before
+use Gordalina\MixpanelBundle\Annotation as Mixpanel;
+
+/**
+ * @Mixpanel\Track("Order Completed", props={
+ *      "user_id": @Mixpanel\Expression("user.getId()")
+ * })
+ * @Mixpanel\Set(id=@Mixpanel\Id, props={"plan": "pro"})
+ */
+
+// after
+use Gordalina\MixpanelBundle\Attribute as Mixpanel;
+
+#[Mixpanel\Track('Order Completed', props: ['user_id' => new Mixpanel\Expression('user.getId()')])]
+#[Mixpanel\Set(id: new Mixpanel\Id(), props: ['plan' => 'pro'])]
+```
+
+Rector only rewrites an annotation whose target class it can load and finds marked
+`#[Attribute]`, and it skips it silently otherwise. So if the dry-run reports no
+change on a controller you know has annotations, the bundle is not autoloadable
+from where you ran it — that, or a previous run cached the file (`--clear-cache`).
+
+Versions 6.0 to 6.x shipped a ready-made set for this
+(`MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES`). It was removed in 7.0 — the config
+above supersedes it, and lives in the one place where the Rector version in use is
+actually known.
+
+#### If you already use attributes
+
+Since every action class kept its name, the aliased style migrates with a single
+`use` line per file:
+
+```sh
+$ grep -rl 'MixpanelBundle\\Annotation' src/ \
+    | xargs sed -i 's/MixpanelBundle\\Annotation/MixpanelBundle\\Attribute/g'
+```
+
+Then fix the remaining renames by hand — `Annotation\Annotation` becomes
+`Attribute\Action`, `getAnnotation()` becomes `getAttribute()`, and the
+`annotation:` named argument of `new MixpanelEvent(...)` becomes `attribute:` —
+which only affects listeners of your own that inspect or dispatch Mixpanel
+attributes. Or let Rector do the first two:
+
+```php
+// rector.php
+declare(strict_types=1);
+
+use Rector\Config\RectorConfig;
+use Rector\Renaming\Rector\MethodCall\RenameMethodRector;
+use Rector\Renaming\Rector\Name\RenameClassRector;
+use Rector\Renaming\ValueObject\MethodCallRename;
+
+return RectorConfig::configure()
+    ->withPaths([__DIR__.'/src'])
+    ->withImportNames(importShortClasses: false)
+    ->withConfiguredRule(RenameClassRector::class, [
+        'Gordalina\MixpanelBundle\Annotation\Annotation' => 'Gordalina\MixpanelBundle\Attribute\Action',
+        'Gordalina\MixpanelBundle\Annotation\Register' => 'Gordalina\MixpanelBundle\Attribute\Register',
+        'Gordalina\MixpanelBundle\Annotation\Track' => 'Gordalina\MixpanelBundle\Attribute\Track',
+        'Gordalina\MixpanelBundle\Annotation\Unregister' => 'Gordalina\MixpanelBundle\Attribute\Unregister',
+        'Gordalina\MixpanelBundle\Annotation\Append' => 'Gordalina\MixpanelBundle\Attribute\Append',
+        'Gordalina\MixpanelBundle\Annotation\ClearCharges' => 'Gordalina\MixpanelBundle\Attribute\ClearCharges',
+        'Gordalina\MixpanelBundle\Annotation\DeleteUser' => 'Gordalina\MixpanelBundle\Attribute\DeleteUser',
+        'Gordalina\MixpanelBundle\Annotation\Increment' => 'Gordalina\MixpanelBundle\Attribute\Increment',
+        'Gordalina\MixpanelBundle\Annotation\Remove' => 'Gordalina\MixpanelBundle\Attribute\Remove',
+        'Gordalina\MixpanelBundle\Annotation\Set' => 'Gordalina\MixpanelBundle\Attribute\Set',
+        'Gordalina\MixpanelBundle\Annotation\SetOnce' => 'Gordalina\MixpanelBundle\Attribute\SetOnce',
+        'Gordalina\MixpanelBundle\Annotation\TrackCharge' => 'Gordalina\MixpanelBundle\Attribute\TrackCharge',
+        'Gordalina\MixpanelBundle\Annotation\UpdateUser' => 'Gordalina\MixpanelBundle\Attribute\UpdateUser',
+        'Gordalina\MixpanelBundle\Annotation\Expression' => 'Gordalina\MixpanelBundle\Attribute\Expression',
+        'Gordalina\MixpanelBundle\Annotation\Id' => 'Gordalina\MixpanelBundle\Attribute\Id',
+    ])
+    ->withConfiguredRule(RenameMethodRector::class, [
+        new MethodCallRename('Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent', 'getAnnotation', 'getAttribute'),
+    ]);
+```
+
+Note that `RenameClassRector` replaces the `as Mixpanel` alias with one import per
+class (`#[Mixpanel\Track]` becomes `#[Track]`), which is why the `sed` above is
+worth preferring if you like the prefixed style.
+
+#### Manual migration
+
+Converting annotations by hand, three things to watch out for:
+
+- Nested actions such as `@Mixpanel\Id` or `@Mixpanel\Expression(...)` become real
+  object instantiations: `new Mixpanel\Id()`, `new Mixpanel\Expression('...')`
+- `@Mixpanel\Remove` takes a `props` array, not a `prop` scalar — the previous
+  README documented this incorrectly
+- Any listener of your own that reads Mixpanel annotations through a
+  `Doctrine\Common\Annotations\Reader` must move to
+  [`ControllerEvent::getAttributes()`](README.md#override-props-in-all-attributes)
+  at the same time, otherwise it stops seeing the migrated controllers without any
+  error
+
 ## [v6.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/releases/tag/6.0.0)
 
 [5.1.1...6.0.0](https://github.com/gordalina/GordalinaMixpanelBundle/compare/5.1.1...6.0.0)

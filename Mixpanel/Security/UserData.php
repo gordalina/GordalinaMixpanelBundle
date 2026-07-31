@@ -31,26 +31,11 @@ class UserData
      */
     private $accessor;
 
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
-
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
-
-    /**
-     * @var bool
-     */
-    private $displayErrors;
-
-    public function __construct(TokenStorageInterface $tokenStorage, ManagerRegistry $registry, bool $displayErrors)
-    {
-        $this->tokenStorage  = $tokenStorage;
-        $this->registry      = $registry;
-        $this->displayErrors = $displayErrors;
+    public function __construct(
+        private TokenStorageInterface $tokenStorage,
+        private ManagerRegistry $registry,
+        private bool $displayErrors,
+    ) {
     }
 
     /**

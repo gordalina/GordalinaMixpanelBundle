@@ -11,19 +11,18 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Annotation;
+namespace Gordalina\MixpanelBundle\Attribute;
 
 /**
- * Placeholder resolved to the current user's distinct id.
- *
- * Used as a value of another attribute, e.g.
- * #[Set(props: ['plan' => 'pro'], id: new Id())]
- *
- * @Annotation
- * @Target("ANNOTATION")
+ * Base class of every Mixpanel action.
  *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
-final class Id
+abstract class Action
 {
+    public function __construct(
+        public ?string $project = null,
+        public string|bool|null $condition = null,
+    ) {
+    }
 }

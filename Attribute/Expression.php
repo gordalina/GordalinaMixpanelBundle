@@ -11,22 +11,20 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Annotation;
+namespace Gordalina\MixpanelBundle\Attribute;
 
 /**
- * Abstract Annotation
+ * Placeholder resolved by evaluating an ExpressionLanguage expression.
  *
- * Concrete children are usable both as PHP attributes and, for backwards
- * compatibility, as Doctrine annotations. Doctrine annotation support is
- * deprecated and will be removed in the next major version.
+ * Used as a value of another attribute, e.g.
+ * #[Track('Order Completed', props: ['user_id' => new Expression('user.getId()')])]
  *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
-abstract class Annotation
+final class Expression
 {
     public function __construct(
-        public ?string $project = null,
-        public string|bool|null $condition = null,
+        public string $expression,
     ) {
     }
 }

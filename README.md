@@ -16,9 +16,7 @@ into Symfony.
 - [Send an event based on a condition](#send-an-event-based-on-a-condition)
 - [MixpanelEvent](#mixpanelevent)
 - [Override Props in all Attributes](#override-props-in-all-attributes)
-- [Upgrading from Doctrine annotations](#upgrading-from-doctrine-annotations)
-    - [Automated migration with Rector](#automated-migration-with-rector)
-    - [Manual migration](#manual-migration)
+- [Upgrading from 6.x](#upgrading-from-6x)
 - [Symfony Profiler Integration](#symfony-profiler-integration)
 - [Reference Configuration](#reference-configuration)
 - [Spec](#spec)
@@ -27,10 +25,12 @@ into Symfony.
 Installation
 ------------
 
+This version requires PHP `^8.2` and Symfony `^6.4 || ^7.4 || ^8.0`.
+
 Require [`gordalina/mixpanel-bundle`](https://packagist.org/packages/gordalina/mixpanel-bundle) using composer
 
 ```sh
-$ php composer.phar require gordalina/mixpanel-bundle:~6.0
+$ php composer.phar require gordalina/mixpanel-bundle:~7.0
 ```
 
 Or require
@@ -41,7 +41,7 @@ to your `composer.json` file:
 ```json
 {
     "require": {
-        "gordalina/mixpanel-bundle": "~6.0"
+        "gordalina/mixpanel-bundle": "~7.0"
     }
 }
 ```
@@ -97,7 +97,7 @@ Track an event with a single attribute
 <?php
 // CheckoutController.php
 
-use Gordalina\MixpanelBundle\Annotation as Mixpanel;
+use Gordalina\MixpanelBundle\Attribute as Mixpanel;
 
 class CheckoutController
 {
@@ -148,7 +148,7 @@ it will work.
 <?php
 // UserController.php
 
-use Gordalina\MixpanelBundle\Annotation as Mixpanel;
+use Gordalina\MixpanelBundle\Attribute as Mixpanel;
 
 class UserController
 {
@@ -169,7 +169,7 @@ for evaluation.
 <?php
 // OrderController.php
 
-use Gordalina\MixpanelBundle\Annotation as Mixpanel;
+use Gordalina\MixpanelBundle\Attribute as Mixpanel;
 
 class OrderController
 {
@@ -251,7 +251,7 @@ You can also send an event through symfony events when the attributes are not su
 #In controller
 namespace myNamespace;
 
-use Gordalina\MixpanelBundle\Annotation as Annotation;
+use Gordalina\MixpanelBundle\Attribute as Mixpanel;
 use Gordalina\MixpanelBundle\Mixpanel\Event\MixpanelEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -260,12 +260,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 public function edit(User $user, EventDispatcherInterface $eventDispatcher, Request $request)
 {
     // Your code
-    $annotation = new Annotation\Track('My event', [
+    $attribute = new Mixpanel\Track('My event', [
         'prop 1' => 'data 1',
         'prop 2' => 'data 2',
     ]);
 
-    $eventDispatcher->dispatch(new MixpanelEvent($annotation, $request));
+    $eventDispatcher->dispatch(new MixpanelEvent($attribute, $request));
     // Rest of your code
 }
 ```
@@ -287,7 +287,7 @@ It can be annoying to always have to put the same properties in your attributes.
 ```php
 namespace YourNamespace;
 
-use Gordalina\MixpanelBundle\Annotation;
+use Gordalina\MixpanelBundle\Attribute;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -301,7 +301,7 @@ class MixpanelListener
     {
         foreach ($event->getAttributes() as $attributes) {
             foreach ($attributes as $attribute) {
-                if ($attribute instanceof Annotation\Annotation && property_exists($attribute, 'props')) {
+                if ($attribute instanceof Attribute\Action && property_exists($attribute, 'props')) {
                     $attribute->props['user_id'] = $this->security->getUser()->getId();
                 }
             }
@@ -324,71 +324,14 @@ services:
 own listener runs at. `ControllerEvent::getAttributes()` returns the very instances
 the bundle will read, so mutating them here is enough.
 
-**Upgrading**: if such a listener previously used a `Doctrine\Common\Annotations\Reader`
-to reach the annotations, it must be rewritten as above. A reader never sees PHP
-attributes, so the moment a controller is migrated the listener stops enriching
-anything — silently, with the events still being sent without the added properties.
+**Upgrading**: if such a listener used a `Doctrine\Common\Annotations\Reader` to
+reach the annotations, it must be rewritten as above. A reader never sees PHP
+attributes, so it stops enriching anything — silently, with the events still being
+sent without the added properties.
 
-### Upgrading from Doctrine annotations
+### Upgrading from 6.x
 
-Doctrine annotations still work in this version, but they are deprecated and will
-be removed in the next major version. Symfony 7 no longer ships an
-`annotation_reader` service, so the bundle registers its own
-(`gordalina_mixpanel.annotation_reader`) and depends on `doctrine/annotations`
-explicitly.
-
-#### Automated migration with Rector
-
-The bundle ships a [Rector](https://getrector.com) set that converts every Mixpanel
-annotation into its attribute form. Install Rector, then point it at your code:
-
-```php
-// rector.php
-declare(strict_types=1);
-
-use Gordalina\MixpanelBundle\Rector\MixpanelSetList;
-use Rector\Config\RectorConfig;
-
-return RectorConfig::configure()
-    ->withPaths([__DIR__.'/src'])
-    ->withSets([MixpanelSetList::ANNOTATIONS_TO_ATTRIBUTES]);
-```
-
-```sh
-$ vendor/bin/rector --dry-run   # review first
-$ vendor/bin/rector
-```
-
-Nested values are handled too — `@Mixpanel\Id` becomes `new Mixpanel\Id()` and
-`@Mixpanel\Expression("...")` becomes `new Mixpanel\Expression('...')`:
-
-```php
-// before
-/**
- * @Mixpanel\Track("Order Completed", props={
- *      "user_id": @Mixpanel\Expression("user.getId()")
- * })
- * @Mixpanel\Set(id=@Mixpanel\Id, props={"plan": "pro"})
- */
-
-// after
-#[Mixpanel\Track('Order Completed', props: ['user_id' => new Mixpanel\Expression('user.getId()')])]
-#[Mixpanel\Set(id: new Mixpanel\Id(), props: ['plan' => 'pro'])]
-```
-
-#### Manual migration
-
-If you'd rather convert by hand, two things to watch out for:
-
-- Nested actions such as `@Mixpanel\Id` or `@Mixpanel\Expression(...)` become real
-  object instantiations: `new Mixpanel\Id()`, `new Mixpanel\Expression('...')`
-- `@Mixpanel\Remove` takes a `props` array, not a `prop` scalar — the previous
-  README documented this incorrectly
-- Any listener of your own that reads Mixpanel annotations through a
-  `Doctrine\Common\Annotations\Reader` must move to
-  [`ControllerEvent::getAttributes()`](#override-props-in-all-attributes) at the
-  same time, otherwise it stops seeing the migrated controllers without any error
-
+See [Upgrading from 6.x](CHANGELOG.md#upgrading-from-6x) in the changelog.
 
 ### Symfony Profiler Integration
 

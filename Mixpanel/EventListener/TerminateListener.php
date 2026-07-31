@@ -18,14 +18,8 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
 class TerminateListener
 {
-    /**
-     * @var Flusher
-     */
-    private $flusher;
-
-    public function __construct(Flusher $flusher)
+    public function __construct(private Flusher $flusher)
     {
-        $this->flusher = $flusher;
     }
 
     public function onTerminate(TerminateEvent $e): void

@@ -43,10 +43,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # PHP 8.4 so that "highest" resolves Symfony 8 and the analysis runs
+      # against the newest supported component APIs.
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: "8.4"
           extensions: mbstring
           coverage: none
 
@@ -63,16 +65,34 @@ jobs:
     runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
+      # Combinations are listed explicitly: Symfony 8 requires PHP >= 8.4, so a
+      # cross product would generate a php 8.2 / symfony 8.0 job that can never
+      # install.
       matrix:
-        php: ["8.2", "8.4"]
-        symfony: ["6.4", "7.4"]
-        dependencies: ["highest"]
         include:
           - php: "8.2"
             symfony: "6.4"
             dependencies: "lowest"
+          - php: "8.2"
+            symfony: "6.4"
+            dependencies: "highest"
+          - php: "8.2"
+            symfony: "7.4"
+            dependencies: "highest"
+          - php: "8.4"
+            symfony: "6.4"
+            dependencies: "highest"
           - php: "8.4"
             symfony: "7.4"
+            dependencies: "highest"
+          - php: "8.4"
+            symfony: "8.0"
+            dependencies: "lowest"
+          - php: "8.4"
+            symfony: "8.0"
+            dependencies: "highest"
+          - php: "8.4"
+            symfony: "8.0"
             dependencies: "highest"
             os: "macos-latest"
     steps:
@@ -91,7 +111,7 @@ jobs:
           SYMFONY_VERSION: ${{ matrix.symfony }}
         run: |
           composer require --no-update --no-interaction \
-            symfony/{framework-bundle,expression-language,security-http,http-kernel,property-access}:"^${SYMFONY_VERSION}"
+            symfony/{framework-bundle,expression-language,security-http,http-kernel,property-access,yaml}:"^${SYMFONY_VERSION}"
           composer require --no-update --no-interaction --dev \
             symfony/stopwatch:"^${SYMFONY_VERSION}"
 

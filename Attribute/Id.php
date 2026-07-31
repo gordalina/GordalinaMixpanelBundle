@@ -11,24 +11,16 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Gordalina\MixpanelBundle\Annotation;
+namespace Gordalina\MixpanelBundle\Attribute;
 
 /**
- * Placeholder resolved by evaluating an ExpressionLanguage expression.
+ * Placeholder resolved to the current user's distinct id.
  *
  * Used as a value of another attribute, e.g.
- * #[Track('Order Completed', props: ['user_id' => new Expression('user.getId()')])]
- *
- * @Annotation
- * @NamedArgumentConstructor
- * @Target("ANNOTATION")
+ * #[Set(props: ['plan' => 'pro'], id: new Id())]
  *
  * @author Samuel Gordalina <samuel.gordalina@gmail.com>
  */
-final class Expression
+final class Id
 {
-    public function __construct(
-        public string $expression,
-    ) {
-    }
 }

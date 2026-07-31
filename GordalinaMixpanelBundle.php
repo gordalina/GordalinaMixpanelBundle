@@ -13,16 +13,8 @@ declare(strict_types=1);
 
 namespace Gordalina\MixpanelBundle;
 
-use Gordalina\MixpanelBundle\DependencyInjection\Compiler\AnnotationReaderPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class GordalinaMixpanelBundle extends Bundle
 {
-    public function build(ContainerBuilder $container): void
-    {
-        parent::build($container);
-
-        $container->addCompilerPass(new AnnotationReaderPass());
-    }
 }
